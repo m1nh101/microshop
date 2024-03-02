@@ -29,6 +29,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\Common\Common\Common.csproj" />
     <ProjectReference Include="..\..\Share\Auth\Auth.csproj" />
+    <ProjectReference Include="..\..\Share\Common\Common.csproj" />
   </ItemGroup>
 
 </Project>
