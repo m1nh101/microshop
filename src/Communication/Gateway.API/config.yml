@@ -1,0 +1,19 @@
+﻿ReserveProxy:
+  Routes:
+    UserService:
+      ClusterId: UserService
+      Match:
+        Path: "/api/{**catch-all}"
+    ProductService:
+      ClusterId: ProductService
+      Match:
+        Path: "/api/{**catch-all}"
+  Clusters:
+    UserService:
+      Destinations:
+        UserService-1:
+          Address: https://localhost:7100
+    ProductService:
+      Destinations:
+        ProductService-1:
+          Address: https://localhost:7295
