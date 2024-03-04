@@ -62,6 +62,8 @@ public static class AuthConfiguration
         policy.RequireAuthenticatedUser();
       });
 
+    services.AddScoped<IUserSessionContext, UserSessionContext>();
+
     return services;
   }
 }
