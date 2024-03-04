@@ -3,17 +3,27 @@
     UserService:
       ClusterId: UserService
       Match:
-        Path: "/api/{**catch-all}"
+        Path: "/user-api/{**catch-all}"
+      Transforms:
+        - PathRemovePrefix: /user-api
+        - PathPrefix: /api
     ProductService:
       ClusterId: ProductService
       Match:
-        Path: "/api/{**catch-all}"
+        Path: "/product-api/{**catch-all}"
+      Transforms:
+        - PathRemovePrefix: /product-api
+        - PathPrefix: /api
   Clusters:
     UserService:
       Destinations:
         UserService-1:
           Address: https://localhost:7100
+        UserService-2:
+          Address: http://localhost:5236
     ProductService:
       Destinations:
         ProductService-1:
           Address: https://localhost:7295
+        ProductService-2:
+          Address: http://localhost:5138
