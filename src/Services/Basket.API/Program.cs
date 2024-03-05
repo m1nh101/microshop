@@ -1,9 +1,29 @@
+using Basket.API.RPC.Clients;
+using Redis.OM;
+using Redis.OM.Contracts;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+builder.Services.AddSingleton<IRedisConnectionProvider>(sp =>
+{
+  var configuration = new RedisConnectionConfiguration
+  {
+    Host = builder.Configuration.GetConnectionString("RedisConnections") ?? throw new NullReferenceException(),
+    Port = 6379
+  };
+
+  return new RedisConnectionProvider(configuration);
+});
+
+builder.Services.AddSingleton<ProductRpcClient>(sp =>
+{
+  return new ProductRpcClient(() => "https://localhost:7295");
+});
 
 var app = builder.Build();
 

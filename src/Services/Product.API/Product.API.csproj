@@ -11,6 +11,12 @@
     <PackageReference Include="FastEndpoints" Version="5.23.0" />
     <PackageReference Include="FastEndpoints.Security" Version="5.23.0" />
     <PackageReference Include="FastEndpoints.Swagger" Version="5.23.0" />
+    <PackageReference Include="Google.Protobuf" Version="3.25.3" />
+    <PackageReference Include="Grpc.AspNetCore.Server" Version="2.61.0" />
+    <PackageReference Include="Grpc.Tools" Version="2.62.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.0.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.2" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.2">
@@ -29,5 +35,13 @@
     <ProjectReference Include="..\..\Share\Auth\Auth.csproj" />
     <ProjectReference Include="..\..\Share\Common\Common.csproj" />
   </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="RPC\Protos\" />
+  </ItemGroup>
+
+	<ItemGroup>
+		<Protobuf Include="RPC\Protos\product.proto" />
+	</ItemGroup>
 
 </Project>

@@ -1,0 +1,27 @@
+syntax = "proto3";
+
+service ProductRpc {
+	rpc GetProduct (GetProductDetailRequest) returns (GetProductReply);
+	rpc GetProductInBasket (GetProductInBasketRequest) returns (GetProductInBasketReply);
+}
+
+message GetProductDetailRequest {
+	string ProductId = 1;
+}
+
+message GetProductInBasketRequest {
+	repeated string ProductIds = 2;
+}
+
+message GetProductReply {
+	string ProductId = 1;
+	string Name = 2;
+	string PictureUri = 3;
+	string Description = 4;
+	int32 AvailableStock = 5;
+	double Price = 6;
+}
+
+message GetProductInBasketReply {
+	repeated GetProductReply Products = 1;
+}

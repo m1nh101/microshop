@@ -4,6 +4,7 @@ using FastEndpoints.Swagger;
 using Microsoft.EntityFrameworkCore;
 using Product.API.HostedServices;
 using Product.API.Infrastructure.Database;
+using Product.API.RPC.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -24,6 +25,8 @@ builder.Services.AddSingleton<DatabaseMigrator>();
 
 builder.Services.AddHostedService<DatabaseHostedService>();
 
+builder.Services.AddGrpc();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -32,6 +35,8 @@ if (app.Environment.IsDevelopment())
   app.UseSwagger();
   app.UseSwaggerUI();
 }
+
+app.MapGrpcService<ProductRpcService>();
 
 app.UseHttpsRedirection();
 
