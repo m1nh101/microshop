@@ -2,4 +2,4 @@
 
 public sealed record AddOrUpdateBasketItemRequest(
   string ProductId,
-  string Quantity);
+  int Quantity);

@@ -21,4 +21,14 @@ public class CustomerBasket
 
     return error;
   }
+
+  public Error RemoveItem(string productId)
+  {
+    var item = Items.FirstOrDefault(e => e.ProductId == productId);
+    if (item is null)
+      return Errors.ItemNotExist;
+
+    Items.Remove(item);
+    return Error.None;
+  }
 }
