@@ -7,6 +7,7 @@ using FastEndpoints;
 
 namespace Basket.API.Endpoints;
 
+[HttpGet("/api/baskets")]
 public sealed class GetBasketEndpoint : Endpoint<GetBasketRequest, Result<CustomerBasket>>
 {
   private readonly IUserSessionContext _session;

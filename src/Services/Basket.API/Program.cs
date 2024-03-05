@@ -1,3 +1,4 @@
+using Auth;
 using Basket.API.RPC.Clients;
 using Redis.OM;
 using Redis.OM.Contracts;
@@ -20,10 +21,12 @@ builder.Services.AddSingleton<IRedisConnectionProvider>(sp =>
   return new RedisConnectionProvider(configuration);
 });
 
-builder.Services.AddSingleton<ProductRpcClient>(sp =>
+builder.Services.AddSingleton(sp =>
 {
   return new ProductRpcClient(() => "https://localhost:7295");
 });
+
+builder.Services.AddJwt(builder.Configuration);
 
 var app = builder.Build();
 
@@ -35,5 +38,9 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseAuthentication();
+
+app.UseAuthorization();
 
 app.Run();

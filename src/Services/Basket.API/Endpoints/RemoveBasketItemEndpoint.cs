@@ -7,6 +7,7 @@ using FastEndpoints;
 
 namespace Basket.API.Endpoints;
 
+[HttpDelete("/api/baskets/items/{productId}")]
 public sealed class RemoveBasketItemEndpoint : Endpoint<RemoveBasketItemRequest, Result<BasketChangedResponse>>
 {
   private readonly IUserSessionContext _session;

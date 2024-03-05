@@ -14,6 +14,13 @@
       Transforms:
         - PathRemovePrefix: /product-api
         - PathPrefix: /api
+    BasketService:
+      ClusterId: BasketService
+      Match:
+        Path: "/basket-api/{**catch-all}"
+      Transforms:
+        - PathRemovePrefix: /basket-api
+        - PathPrefix: /api
   Clusters:
     UserService:
       Destinations:
@@ -27,3 +34,9 @@
           Address: https://localhost:7295
         ProductService-2:
           Address: http://localhost:5138
+    BasketService:
+      Destinations:
+        BasketService-1:
+          Address: https://localhost:7024
+        BasketService-2:
+          Address: http://localhost:5188

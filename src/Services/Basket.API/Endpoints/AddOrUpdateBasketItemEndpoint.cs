@@ -9,6 +9,7 @@ using FastEndpoints;
 
 namespace Basket.API.Endpoints;
 
+[HttpPost("/api/baskets/update")]
 public sealed class AddOrUpdateBasketItemEndpoint : Endpoint<AddOrUpdateBasketItemRequest, Result<BasketChangedResponse>>
 {
   private readonly IUserSessionContext _session;
