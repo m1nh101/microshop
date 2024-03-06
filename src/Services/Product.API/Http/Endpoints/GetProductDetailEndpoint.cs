@@ -30,7 +30,7 @@ public class GetProductDetailEndpoint : Endpoint<GetProductByIdRequest, Result<P
         e.Description))
       .FirstOrDefaultAsync(e => e.Id == req.Id, ct);
 
-    if(product is null)
+    if (product is null)
     {
       await SendAsync(
         response: Errors.ProductNotFound,

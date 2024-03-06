@@ -32,7 +32,7 @@ public sealed class RequireAccessTokenEndpoint : Endpoint<RequireAccessTokenRequ
   {
     // check token validation
     var token = await _cache.GetTokenByRefreshToken(req.RefreshToken);
-    if(token == null)
+    if (token == null)
     {
       await SendAsync(
         response: Errors.RefreshTokenIsNotValid,

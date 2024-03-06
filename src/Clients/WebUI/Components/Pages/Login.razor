@@ -1,0 +1,47 @@
+﻿@page "/login"
+@using WebUI.Models
+
+<style>
+  .form-outer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    background: rgb(2,0,36);
+    background: linear-gradient(90deg, rgba(2,0,36,1) 0%, rgba(9,111,121,1) 25%, rgba(0,212,255,1) 100%);
+  }
+
+  .form-container {
+    padding: 20px 20px 20px 0px;
+    border-radius: 8px;
+    width: 500px;
+    box-shadow: 0px 0px 6px 0px rgba(0,0,0,0.75);
+    -webkit-box-shadow: 0px 0px 6px 0px rgba(0,0,0,0.75);
+    -moz-box-shadow: 0px 0px 6px 0px rgba(0,0,0,0.75);
+    background: white;
+  }
+</style>
+
+<div class="form-outer">
+  <div class="form-container">
+    <Form
+      Model="request"
+      LabelColSpan="4"
+      WrapperColSpan="20"
+      Size="Large">
+      <FormItem Label="Username">
+        <Input @bind-Value="@context.Username" TValue="string"/>
+      </FormItem>
+      <FormItem Label="Password">
+        <InputPassword @bind-Value="@context.Password"/>
+      </FormItem>
+      <FormItem WrapperColOffset="4" WrapperColSpan="20">
+        <Button Type="@ButtonType.Primary" HtmlType="submit">Login</Button>
+      </FormItem>
+    </Form>
+  </div>
+</div>
+
+@code {
+  AuthenticateRequest request = new();
+}

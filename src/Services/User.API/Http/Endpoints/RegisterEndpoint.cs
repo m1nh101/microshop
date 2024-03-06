@@ -44,7 +44,7 @@ public sealed class RegisterEndpoint : Endpoint<RegisterRequest, Result<Register
     if (req.Password != req.ConfirmPassword)
       errors.Add(Errors.ConfirmPasswordNotMatch);
 
-    if(errors.Count != 0)
+    if (errors.Count != 0)
     {
       await SendAsync(
         response: errors,

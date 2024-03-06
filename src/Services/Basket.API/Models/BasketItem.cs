@@ -9,7 +9,7 @@ public class BasketItem
   public double Price { get; private set; }
   public int Quantity { get; private set; }
   public string PictureUri { get; set; } = string.Empty;
-  public string Description { get; set; } = string.Empty; 
+  public string Description { get; set; } = string.Empty;
 
   public Error SetQuantity(int quantity)
   {

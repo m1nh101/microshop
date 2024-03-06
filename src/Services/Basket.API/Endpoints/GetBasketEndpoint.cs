@@ -22,7 +22,7 @@ public sealed class GetBasketEndpoint : Endpoint<GetBasketRequest, Result<Custom
   public override async Task HandleAsync(GetBasketRequest req, CancellationToken ct)
   {
     var basket = await _repository.GetBasket(_session.UserId);
-    if(basket is null)
+    if (basket is null)
     {
       await SendAsync(
         response: Errors.BasketNotFound,

@@ -54,7 +54,7 @@ public sealed class AuthenticateEndpoint : Endpoint<AuthenticateRequest, Result<
     }
 
     var password = _passwordGenerator.Generate(req.Password);
-    if(password != user.Password)
+    if (password != user.Password)
     {
       var error = Result<AuthenticateResponse>.Failed(new Error("User.WrongPassword", "password is incorrect!"));
       await SendAsync(
@@ -83,7 +83,7 @@ public sealed class AuthenticateEndpoint : Endpoint<AuthenticateRequest, Result<
 
     // store access token to cache system
     await _cache.AddUserToken(userToken);
-    
+
     await SendAsync(
       response: Result<AuthenticateResponse>.Ok(new(user.Id, accessToken, userToken.RefreshToken)),
       statusCode: 200,

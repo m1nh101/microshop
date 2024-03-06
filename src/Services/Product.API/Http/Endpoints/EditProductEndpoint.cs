@@ -21,8 +21,8 @@ public sealed class EditProductEndpoint : Endpoint<EditProductRequest, Result<Pr
   public override async Task HandleAsync(EditProductRequest req, CancellationToken ct)
   {
     var product = await _context.Products.FirstOrDefaultAsync(e => e.Id == req.Id, ct);
-    
-    if(product == null)
+
+    if (product == null)
     {
       await SendAsync(
         response: Errors.ProductNotFound,

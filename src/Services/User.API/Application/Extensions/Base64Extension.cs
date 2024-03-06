@@ -16,7 +16,7 @@ public static class Base64Extension
   public static UserToken FromBase64(this string base64String)
   {
     var base64EncodedBytes = Convert.FromBase64String(base64String);
-    var plainText =  Encoding.UTF8.GetString(base64EncodedBytes);
+    var plainText = Encoding.UTF8.GetString(base64EncodedBytes);
     return JsonConvert.DeserializeObject<UserToken>(plainText)!;
   }
 }

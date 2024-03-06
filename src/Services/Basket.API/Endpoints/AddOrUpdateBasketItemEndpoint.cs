@@ -40,7 +40,7 @@ public sealed class AddOrUpdateBasketItemEndpoint : Endpoint<AddOrUpdateBasketIt
 
     // check product is valid or not
     var product = await _productClient.GetProduct(req.ProductId);
-    if(product is null)
+    if (product is null)
     {
       await SendAsync(
         response: Errors.InvalidProduct,
@@ -50,7 +50,7 @@ public sealed class AddOrUpdateBasketItemEndpoint : Endpoint<AddOrUpdateBasketIt
     }
 
     // check quantity is valid or not
-    if(product.AvailableStock < req.Quantity)
+    if (product.AvailableStock < req.Quantity)
     {
       await SendAsync(
         response: Errors.InvalidQuantity,
@@ -68,7 +68,7 @@ public sealed class AddOrUpdateBasketItemEndpoint : Endpoint<AddOrUpdateBasketIt
     };
 
     Error[] errors = [basketItem.SetQuantity(req.Quantity), basketItem.SetPrice(product.Price)];
-    if(errors.Length > 0)
+    if (errors.Length > 0)
     {
       await SendAsync(
         response: Result<BasketChangedResponse>.Failed(errors),
@@ -84,7 +84,7 @@ public sealed class AddOrUpdateBasketItemEndpoint : Endpoint<AddOrUpdateBasketIt
     var response = new BasketChangedResponse();
 
     await SendAsync(
-      response:  response,
+      response: response,
       statusCode: 200,
       cancellation: ct);
   }

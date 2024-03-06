@@ -19,7 +19,7 @@ public class DatabaseMigrator
     var context = scope.ServiceProvider.GetRequiredService<ProductDbContext>();
 
     var pendingMigrations = await context.Database.GetPendingMigrationsAsync();
-    if(pendingMigrations.Any())
+    if (pendingMigrations.Any())
     {
       await context.Database.MigrateAsync();
 

@@ -1,5 +1,4 @@
-﻿using Newtonsoft.Json.Linq;
-using System.Security.Cryptography;
+﻿using System.Security.Cryptography;
 using System.Text;
 using User.API.Application.Contracts;
 

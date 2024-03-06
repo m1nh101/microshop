@@ -22,7 +22,7 @@ public sealed class RemoveBasketItemEndpoint : Endpoint<RemoveBasketItemRequest,
   public override async Task HandleAsync(RemoveBasketItemRequest req, CancellationToken ct)
   {
     var basket = await _repository.GetBasket(_session.UserId);
-    if(basket is null)
+    if (basket is null)
     {
       await SendAsync(
         response: Errors.BasketNotFound,
@@ -32,7 +32,7 @@ public sealed class RemoveBasketItemEndpoint : Endpoint<RemoveBasketItemRequest,
     }
 
     var error = basket.RemoveItem(req.ProductId);
-    if(error is not null)
+    if (error is not null)
     {
       await SendAsync(
         response: error,
