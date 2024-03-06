@@ -8,10 +8,11 @@
 
   <ItemGroup>
     <PackageReference Include="AntDesign" Version="0.18.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="HttpClients\" />
+    <ProjectReference Include="..\..\Share\Common\Common.csproj" />
   </ItemGroup>
 
 </Project>

@@ -1,5 +1,8 @@
 ﻿@page "/login"
 @using WebUI.Models
+@using WebUI.Services
+@inject UserService UserService
+@rendermode InteractiveServer
 
 <style>
   .form-outer {
@@ -28,7 +31,8 @@
       Model="request"
       LabelColSpan="4"
       WrapperColSpan="20"
-      Size="Large">
+      Size="Large"
+      OnFinish="Authenticate">
       <FormItem Label="Username">
         <Input @bind-Value="@context.Username" TValue="string"/>
       </FormItem>
@@ -44,4 +48,11 @@
 
 @code {
   AuthenticateRequest request = new();
+
+  async Task Authenticate()
+  {
+    var response = await UserService.Authenticate(request);
+
+    var b = 0;
+  }
 }
