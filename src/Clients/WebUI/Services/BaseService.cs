@@ -1,21 +1,29 @@
-﻿namespace WebUI.Services;
+﻿using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
+
+namespace WebUI.Services;
 
 public abstract class BaseService
 {
+  protected readonly ProtectedLocalStorage Storage;
   protected readonly HttpClient Client;
 
-  public BaseService(IHttpClientFactory factory, IHttpContextAccessor http)
+  public BaseService(
+    IHttpClientFactory factory,
+    ProtectedLocalStorage storage)
   {
     Client = factory.CreateClient("API");
-    //SettingHttpClient(http);
+    Storage = storage;
   }
 
-  private void SettingHttpClient(IHttpContextAccessor http)
+  protected async Task EnableAuthorizeRequest()
   {
-    var accessToken = http.HttpContext?.Request.Headers.Authorization.ToString()
-      ?? http.HttpContext?.Request.Cookies["access_token"]?.ToString()
-      ?? string.Empty;
+    var getAccessToken = await Storage.GetAsync<string>("access_token");
+    if (getAccessToken.Success && !string.IsNullOrEmpty(getAccessToken.Value))
+    {
+      Client.DefaultRequestHeaders.Add("Authorization", getAccessToken.Value);
+      return;
+    }
 
-    Client.DefaultRequestHeaders.Add("Authorization", accessToken);
+    throw new UnauthorizedAccessException();
   }
 }
