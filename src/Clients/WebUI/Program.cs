@@ -1,3 +1,6 @@
+using Auth;
+using Microsoft.AspNetCore.Components.Authorization;
+using WebUI;
 using WebUI.Components;
 using WebUI.Services;
 
@@ -17,6 +20,10 @@ builder.Services.AddHttpClient("API", (provider, httpClient) =>
 });
 
 builder.Services.AddScoped<UserService>();
+
+builder.Services.AddJwt(builder.Configuration);
+
+//builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthenticationStateProvider>();
 
 var app = builder.Build();
 

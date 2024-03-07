@@ -1,4 +1,5 @@
 ﻿using Common;
+using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
 using Newtonsoft.Json;
 using WebUI.Models;
 
@@ -6,8 +7,8 @@ namespace WebUI.Services;
 
 public sealed class UserService : BaseService
 {
-  public UserService(IHttpClientFactory factory, IHttpContextAccessor http)
-    : base(factory, http)
+  public UserService(IHttpClientFactory factory, ProtectedLocalStorage storage)
+    : base(factory, storage)
   {
   }
 

@@ -16,6 +16,13 @@ public static class AuthConfiguration
       opt.SecretKey = configuration["Token:SecretKey"] ?? throw new NullReferenceException();
     });
 
+    services.AddCookiePolicy(opt =>
+    {
+      opt.MinimumSameSitePolicy = Microsoft.AspNetCore.Http.SameSiteMode.None;
+      opt.Secure = Microsoft.AspNetCore.Http.CookieSecurePolicy.Always;
+      opt.HttpOnly = Microsoft.AspNetCore.CookiePolicy.HttpOnlyPolicy.Always;
+    });
+
     services.AddAuthentication(opt =>
     {
       opt.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -27,6 +34,7 @@ public static class AuthConfiguration
         var key = Encoding.UTF8.GetBytes(configuration["Token:SecretKey"]
           ?? throw new ArgumentNullException("no secret key found"));
 
+        opt.SaveToken = true;
         opt.RequireHttpsMetadata = false;
         opt.TokenValidationParameters = new TokenValidationParameters
         {

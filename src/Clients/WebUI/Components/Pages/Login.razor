@@ -1,7 +1,12 @@
 ﻿@page "/login"
+@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
 @using WebUI.Models
 @using WebUI.Services
 @inject UserService UserService
+@inject NavigationManager Navigator
+@inject ProtectedLocalStorage Storage
+@inject AuthenticationStateProvider AuthenticationProvider
 @rendermode InteractiveServer
 
 <style>
@@ -53,6 +58,10 @@
   {
     var response = await UserService.Authenticate(request);
 
-    var b = 0;
+    if (response.IsSuccess)
+    {
+      await ((CustomAuthenticationStateProvider) AuthenticationProvider).AuthenticateUser(response.Data!.AccessToken);
+      Navigator.NavigateTo("/counter");
+    }
   }
 }

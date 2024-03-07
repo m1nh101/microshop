@@ -84,6 +84,16 @@ public sealed class AuthenticateEndpoint : Endpoint<AuthenticateRequest, Result<
     // store access token to cache system
     await _cache.AddUserToken(userToken);
 
+    var cookieOption = new CookieOptions
+    {
+      HttpOnly = true,
+      Secure = true,
+      SameSite = SameSiteMode.None
+    };
+
+    HttpContext.Response.Cookies.Append("access_token", accessToken, cookieOption);
+    HttpContext.Response.Cookies.Append("refresh_token", userToken.RefreshToken, cookieOption);
+
     await SendAsync(
       response: Result<AuthenticateResponse>.Ok(new(user.Id, accessToken, userToken.RefreshToken)),
       statusCode: 200,
