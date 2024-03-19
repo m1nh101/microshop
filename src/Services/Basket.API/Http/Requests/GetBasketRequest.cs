@@ -1,3 +1,3 @@
-﻿namespace Basket.API.Requests;
+﻿namespace Basket.API.Http.Requests;
 
 public sealed record GetBasketRequest;

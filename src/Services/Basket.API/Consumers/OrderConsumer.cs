@@ -1,4 +1,4 @@
-﻿using Basket.API.Events;
+﻿using Basket.API.Intergrated.Events;
 using FastEndpoints;
 using Newtonsoft.Json;
 using RabbitMQ.Client;
