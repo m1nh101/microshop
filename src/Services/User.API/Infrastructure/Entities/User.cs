@@ -27,6 +27,8 @@ public class User
   public string Password { get; private set; } = string.Empty;
 
   public virtual ICollection<UserRole> Roles { get; private set; } = [];
+  
+  public virtual ICollection<CardPayment>
 
   public void AddToRole(string roleId) => Roles.Add(new UserRole(roleId));
 }

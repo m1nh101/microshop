@@ -31,4 +31,6 @@ public class CustomerBasket
     Items.Remove(item);
     return Error.None;
   }
+
+  public double GetTotalPrice() => Items.Sum(e => e.ToPrice());
 }

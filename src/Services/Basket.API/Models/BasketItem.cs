@@ -28,4 +28,6 @@ public class BasketItem
     Price = price;
     return Error.None;
   }
+
+  public double ToPrice() => Price * Quantity;
 }

@@ -1,5 +1,7 @@
 ﻿namespace Basket.API.Responses;
 
-public class BasketChangedResponse
+public sealed record BasketChangedResponse
 {
+  public required string ProductId { get; init; }
+  public required double TotalItemPrice { get; init; }
 }

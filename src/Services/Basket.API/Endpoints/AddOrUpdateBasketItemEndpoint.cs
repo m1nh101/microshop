@@ -81,7 +81,11 @@ public sealed class AddOrUpdateBasketItemEndpoint : Endpoint<AddOrUpdateBasketIt
 
     await _repository.UpdateBasket(basket);
 
-    var response = new BasketChangedResponse();
+    var response = new BasketChangedResponse()
+    {
+      ProductId = req.ProductId,
+      TotalItemPrice = basketItem.ToPrice()
+    };
 
     await SendAsync(
       response:  response,
