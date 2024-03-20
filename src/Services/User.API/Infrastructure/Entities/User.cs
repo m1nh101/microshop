@@ -28,7 +28,6 @@ public class User
 
   public virtual ICollection<UserRole> Roles { get; private set; } = [];
   
-  public virtual ICollection<CardPayment>
 
   public void AddToRole(string roleId) => Roles.Add(new UserRole(roleId));
 }

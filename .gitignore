@@ -3,3 +3,4 @@
 *.dll
 obj/
 bin/
+*.ps1

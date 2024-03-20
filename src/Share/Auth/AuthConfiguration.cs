@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
@@ -10,6 +11,15 @@ public static class AuthConfiguration
 {
   public static IServiceCollection AddJwt(this IServiceCollection services, IConfiguration configuration)
   {
+    services.AddHttpContextAccessor();
+
+    services.AddCookiePolicy(opt =>
+    {
+      opt.MinimumSameSitePolicy = Microsoft.AspNetCore.Http.SameSiteMode.None;
+      opt.Secure = Microsoft.AspNetCore.Http.CookieSecurePolicy.Always;
+      opt.HttpOnly = Microsoft.AspNetCore.CookiePolicy.HttpOnlyPolicy.Always;
+    });
+
     services.Configure<TokenOption>(opt =>
     {
       opt.ExpiredIn = Convert.ToInt32(configuration["Token:ExpiredIn"]);
@@ -65,5 +75,14 @@ public static class AuthConfiguration
     services.AddScoped<IUserSessionContext, UserSessionContext>();
 
     return services;
+  }
+
+  public static IApplicationBuilder UseAuth(this WebApplication app)
+  {
+    app.UseCookiePolicy();
+    app.UseAuthentication();
+    app.UseAuthorization();
+
+    return app;
   }
 }

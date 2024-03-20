@@ -40,9 +40,7 @@ app.MapGrpcService<ProductRpcService>();
 
 app.UseHttpsRedirection();
 
-app.UseAuthentication();
-
-app.UseAuthorization();
+app.UseAuth();
 
 app.UseFastEndpoints();
 

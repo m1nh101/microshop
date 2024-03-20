@@ -28,15 +28,8 @@ public sealed class AddOrUpdateBasketItemEndpoint : Endpoint<AddOrUpdateBasketIt
 
     public override async Task HandleAsync(AddOrUpdateBasketItemRequest req, CancellationToken ct)
     {
-        var basket = await _repository.GetBasket(_session.UserId);
-        if (basket is null)
-        {
-            await SendAsync(
-              response: Errors.BasketNotFound,
-              statusCode: 400,
-              cancellation: ct);
-            return;
-        }
+        var basket = await _repository.GetBasket(_session.UserId)
+            ?? new CustomerBasket() { CustomerId = _session.UserId };
 
         // check product is valid or not
         var product = await _productClient.GetProduct(req.ProductId);
@@ -68,7 +61,7 @@ public sealed class AddOrUpdateBasketItemEndpoint : Endpoint<AddOrUpdateBasketIt
         };
 
         Error[] errors = [basketItem.SetQuantity(req.Quantity), basketItem.SetPrice(product.Price)];
-        if (errors.Length > 0)
+        if (errors.Where(e => !e.Equals(Error.None)).Any())
         {
             await SendAsync(
               response: Result<BasketChangedResponse>.Failed(errors),

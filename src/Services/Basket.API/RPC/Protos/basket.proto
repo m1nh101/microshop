@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+service BasketRgpc {
+	rpc GetBasket(GetBasketByUserIdRequest) returns (BasketReply);
+}
+
+message GetBasketByUserIdRequest {
+	string UserId = 1;
+}
+
+message BasketReply {
+	repeated BasketItemReply Items = 1;
+}
+
+message BasketItemReply {
+	string ProductId = 1;
+	string ProductName = 2;
+	string PictureUrl = 3;
+	double Price = 4;
+	int32 Quantity = 5;
+}

@@ -3,23 +3,24 @@ using Redis.OM.Modeling;
 
 namespace Basket.API.Models;
 
-[Document(Prefixes = ["CustomerBaskets"])]
+[Document(Prefixes = ["CustomerBaskets"], StorageType = StorageType.Json)]
 public class CustomerBasket
 {
-  [RedisIdField]
+  [RedisIdField, Indexed]
   public string CustomerId { get; set; } = string.Empty;
+  
   public List<BasketItem> Items { get; set; } = [];
 
-  public Error AddOrUpdate(BasketItem item)
+  public void AddOrUpdate(BasketItem item)
   {
-    Error error = Error.None;
     var existItem = Items.FirstOrDefault(e => e.ProductId == item.ProductId);
     if (existItem is null)
       Items.Add(item);
     else
-      error = existItem.SetQuantity(item.Quantity);
-
-    return error;
+    {
+      existItem.SetQuantity(item.Quantity);
+      existItem.SetPrice(item.Price);
+    }
   }
 
   public Error RemoveItem(string productId)

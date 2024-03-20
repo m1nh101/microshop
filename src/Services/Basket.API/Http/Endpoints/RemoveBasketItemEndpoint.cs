@@ -43,7 +43,7 @@ public sealed class RemoveBasketItemEndpoint : Endpoint<RemoveBasketItemRequest,
 
         await _repository.UpdateBasket(basket);
         await SendAsync(
-          response: new BasketChangedResponse(),
+          response: new BasketChangedResponse() { ProductId = req.ProductId, TotalItemPrice = 0 },
           statusCode: 200,
           cancellation: ct);
     }

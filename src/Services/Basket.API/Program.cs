@@ -1,5 +1,8 @@
 using Auth;
+using Basket.API.HostedServices;
+using Basket.API.Repositories;
 using Basket.API.RPC.Clients;
+using FastEndpoints;
 using Redis.OM;
 using Redis.OM.Contracts;
 
@@ -9,12 +12,13 @@ var builder = WebApplication.CreateBuilder(args);
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddFastEndpoints();
 
 builder.Services.AddSingleton<IRedisConnectionProvider>(sp =>
 {
   var configuration = new RedisConnectionConfiguration
   {
-    Host = builder.Configuration.GetConnectionString("RedisConnections") ?? throw new NullReferenceException(),
+    Host = builder.Configuration.GetConnectionString("RedisConnection") ?? throw new NullReferenceException(),
     Port = 6379
   };
 
@@ -28,6 +32,10 @@ builder.Services.AddSingleton(sp =>
 
 builder.Services.AddJwt(builder.Configuration);
 
+builder.Services.AddScoped<IBasketRepository, BasketRepository>();
+
+builder.Services.AddHostedService<RedisIndexHostedService>();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -39,8 +47,8 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-app.UseAuthentication();
+app.UseAuth();
 
-app.UseAuthorization();
+app.UseFastEndpoints();
 
 app.Run();
