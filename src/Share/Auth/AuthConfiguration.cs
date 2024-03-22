@@ -9,8 +9,21 @@ namespace Auth;
 
 public static class AuthConfiguration
 {
+  static readonly string _corsPolicyName = "__cors";
+
   public static IServiceCollection AddJwt(this IServiceCollection services, IConfiguration configuration)
   {
+    services.AddCors(opt =>
+    {
+      opt.AddPolicy(_corsPolicyName, policy =>
+      {
+        policy.AllowAnyHeader()
+          .AllowCredentials()
+          .AllowAnyMethod()
+          .SetIsOriginAllowed(e => new Uri(e).Host == "localhost");
+      });
+    });
+
     services.AddHttpContextAccessor();
 
     services.AddCookiePolicy(opt =>
@@ -79,6 +92,7 @@ public static class AuthConfiguration
 
   public static IApplicationBuilder UseAuth(this WebApplication app)
   {
+    app.UseCors(_corsPolicyName);
     app.UseCookiePolicy();
     app.UseAuthentication();
     app.UseAuthorization();

@@ -1,10 +1,7 @@
-﻿using FastEndpoints;
-
-namespace API.Contract.Users.Requests;
+﻿namespace API.Contract.Users.Requests;
 
 public record RequireAccessTokenRequest
 {
-  [QueryParam]
   public required string RefreshToken { get; init; }
 
   public static bool TryParse(string? input, out RequireAccessTokenRequest request)

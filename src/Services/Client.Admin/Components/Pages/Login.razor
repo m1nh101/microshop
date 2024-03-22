@@ -1,0 +1,28 @@
+﻿@page "/login"
+@using API.Contract.Users.Requests
+@using Microsoft.AspNetCore.Antiforgery
+@attribute [RequireAntiforgeryToken(required: false)]
+@rendermode InteractiveServer
+
+<h3>Login</h3>
+<div>
+  <form method="post" action="/auth" @formname="login-form">
+    <div class="mb-3">
+      <label for="username">Tên đăng nhập</label>
+      <input type="text" name="username" id="username" class="form-control"/>
+    </div>
+    <div class="mb-3">
+      <label for="password">Mật khẩu</label>
+      <input name="password" type="password" id="password" class="form-control"/>
+    </div>
+    <div class="mb-3 d-flex justify-content-between">
+      <button class="btn btn-primary" type="submit">Đăng nhập</button>
+      <a class="btn btn-primary" href="/register">Đăng ký</a>
+    </div>
+  </form>
+</div>
+
+
+@code {
+  
+}
