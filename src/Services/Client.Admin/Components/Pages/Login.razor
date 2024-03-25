@@ -1,28 +1,76 @@
 ﻿@page "/login"
 @using API.Contract.Users.Requests
+@using Client.Admin.Services
 @using Microsoft.AspNetCore.Antiforgery
 @attribute [RequireAntiforgeryToken(required: false)]
-@rendermode InteractiveServer
+
+@inject NavigationManager Navigator;
+@inject UserService Service;
 
 <h3>Login</h3>
 <div>
-  <form method="post" action="/auth" @formname="login-form">
+  <EditForm
+     FormName="login-form"
+     Model="Input"
+     OnValidSubmit="OnSubmitHandler"
+     method="post">
+     <h4 class="text-danger">@message</h4>
     <div class="mb-3">
       <label for="username">Tên đăng nhập</label>
-      <input type="text" name="username" id="username" class="form-control"/>
+      <InputText type="text" @bind-Value="Input.Username" class="form-control"/>
     </div>
     <div class="mb-3">
       <label for="password">Mật khẩu</label>
-      <input name="password" type="password" id="password" class="form-control"/>
+      <InputText type="password" @bind-Value="Input.Password" class="form-control"/>
     </div>
     <div class="mb-3 d-flex justify-content-between">
       <button class="btn btn-primary" type="submit">Đăng nhập</button>
       <a class="btn btn-primary" href="/register">Đăng ký</a>
     </div>
-  </form>
+  </EditForm>
 </div>
 
 
 @code {
-  
+  [SupplyParameterFromForm(FormName = "login-form")]
+  private InputModel Input { get; set; } = new();
+
+  [CascadingParameter]
+  private HttpContext HttpContext { get; set; } = default!;
+
+  private string message = string.Empty;
+
+  public async Task OnSubmitHandler()
+  {
+    var request = Input.ToRequest();
+    var response = await Service.Authenticate(request);
+
+    if(response.IsSuccess)
+    {
+      var accessToken = response.Data!.AccessToken;
+
+      HttpContext.Response.Cookies.Append("access_token", accessToken, new CookieOptions
+      {
+          HttpOnly = true,
+          SameSite = SameSiteMode.None,
+          Secure = true
+      });
+
+      Navigator.NavigateTo("/");
+      return;
+    }
+
+    message = "Sai tên đăng nhập/mật khẩu";
+  }
+
+  private sealed class InputModel
+  {
+    public string Username { get; set; } = string.Empty;
+    public string Password { get; set; } = string.Empty;
+
+    public AuthenticateRequest ToRequest()
+    {
+      return new(Username, Password);
+    }
+  }
 }

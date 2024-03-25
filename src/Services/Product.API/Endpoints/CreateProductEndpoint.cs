@@ -38,6 +38,8 @@ public sealed class CreateProductEndpoint : Endpoint<CreateProductRequest, Resul
           Price: product.Price,
           AvailableStock: product.AvailableStock,
           PictureUri: product.PictureUri,
+          BrandId: product.BrandId,
+          TypeId: product.TypeId,
           Description: product.Description);
 
         await SendAsync(

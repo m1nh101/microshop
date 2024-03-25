@@ -1,0 +1,314 @@
+﻿@page "/products"
+
+@using API.Contract.Products.Requests
+@using API.Contract.Products.Responses
+@using BlazorBootstrap
+@using Client.Admin.Services
+@using System.ComponentModel.DataAnnotations
+
+@rendermode InteractiveServer
+
+<h3>Danh sách sản phẩm</h3>
+<div class="mb-2 row">
+  <div class="col-4">
+    <input class="form-control" @bind-value="Request.Name" placeholder="Tên sản phẩm" />
+  </div>
+  <div class="col-3">
+    <InputSelect @bind-Value="Request.BrandId" class="form-select col-3">
+      <option selected>Nhãn hiệu</option>
+      @foreach (var option in BrandOptions)
+      {
+        <option value="@option.Value">@option.Label</option>
+      }
+    </InputSelect>
+  </div>
+  <div class="col-3">
+    <InputSelect @bind-Value="Request.TypeId" class="form-select col-3">
+      <option selected>Loại</option>
+      @foreach (var option in TypeOptions)
+      {
+        <option value="@option.Value">@option.Label</option>
+      }
+    </InputSelect>
+  </div>
+  <div class="col-2 d-flex justify-content-end">
+    <button class="btn btn-primary" @onclick="Filter">Lọc</button>
+    <button class="btn btn-danger me-2 ms-2" @onclick="ResetFilter">Reset</button>
+  </div>
+</div>
+
+<div class="d-flex justify-content-end">
+  <button class="btn btn-primary me-2" @onclick="OpenCreateForm">Thêm sản phẩm</button>
+</div>
+<table class="table">
+  <thead>
+    <tr>
+      <th scope="col">Tên</th>
+      <th scope="col">Giá</th>
+      <th scope="col"></th>
+    </tr>
+  </thead>
+  <tbody>
+    @foreach (var product in Products)
+    {
+      <tr>
+        <td>@product.Name</td>
+        <td>@product.Price</td>
+        <td>
+          <button class="btn btn-primary me-1" @onclick="@(_ => ShowProductDetail(product.Id))">Chi tiết</button>
+          <button class="btn btn-danger">Xóa</button>
+        </td>
+      </tr>
+    }
+  </tbody>
+</table>
+
+@* ---modal--- *@
+<Modal @ref="modal"
+  IsVerticallyCentered=true
+  Size="ModalSize.Large"
+  Title="@(IsCreateNew ? "Thêm sản phẩm" : "Cập nhật thông tin sản phẩm")">
+  <BodyTemplate>
+    <EditForm class="form" FormName="product-form" Model="Payload" @ref="form">
+      <DataAnnotationsValidator />
+      <div class="mb-3">
+        <label>Tên sản phẩm</label>
+        <InputText class="form-control" @bind-Value="Payload.Name" />
+        <ValidationMessage For="() => Payload.Name"/>
+      </div>
+      <div class="mb-3">
+        <label>Giá</label>
+        <InputNumber class="form-control" @bind-Value="Payload.Price" />
+        <ValidationMessage For="() => Payload.Price" />
+      </div>
+      <div class="mb-3">
+        <label>Số lương tồn kho</label>
+        <InputNumber class="form-control" @bind-Value="Payload.AvailableStock" />
+        <ValidationMessage For="() => Payload.AvailableStock" />
+      </div>
+      <div class="mb-3">
+        <label>Nhãn hiệu</label>
+        <InputSelect class="form-select" @bind-Value="Payload.BrandId">
+          @foreach (var option in BrandOptions)
+          {
+            <option value="@option.Value">@option.Label</option>
+          }
+        </InputSelect>
+        <ValidationMessage For="() => Payload.BrandId" />
+      </div>
+      <div class="mb-3">
+        <label>Loại</label>
+        <InputSelect class="form-select" @bind-Value="Payload.TypeId">
+          @foreach (var option in TypeOptions)
+          {
+            <option value="@option.Value">@option.Label</option>
+          }
+        </InputSelect>
+        <ValidationMessage For="() => Payload.TypeId" />
+      </div>
+      <div class="mb-3">
+        <InputText class="form-control" @bind-Value="Payload.PictureUri" />
+        <ValidationMessage For="() => Payload.PictureUri" />
+      </div>
+      <div class="mb-3">
+        <InputTextArea rows="4" class="form-control" @bind-Value="Payload.Description" />
+      </div>
+    </EditForm>
+  </BodyTemplate>
+  <FooterTemplate>
+    @if(IsCreateNew)
+    {
+      <Button Class="btn btn-primary" @onclick="CreateProduct">Thêm</Button>
+    } else
+    {
+      <Button Class="btn btn-primary" @onclick="EditProduct">Lưu</Button>
+    }
+    <Button Class="btn btn-danger" @onclick="@(_ => modal.HideAsync())">Hủy</Button>
+  </FooterTemplate>
+</Modal>
+
+<Toasts class="p-3" Messages="Messages" Placement="ToastsPlacement.TopRight" AutoHide=true Delay="3000"/>
+
+@code {
+  private IEnumerable<SelectOption> BrandOptions { get; set; } = new List<SelectOption>();
+  private IEnumerable<SelectOption> TypeOptions { get; set; } = new List<SelectOption>();
+  private IEnumerable<ProductPaginationResponse> Products { get; set; } = new List<ProductPaginationResponse>();
+  private FilterRequest Request { get; set; } = new();
+  private InputRequest Payload { get; set; } = new();
+  private bool IsCreateNew { get; set; }
+  private string SelectedProduct { get; set; } = string.Empty;
+  private List<ToastMessage> Messages { get; set; } = new();
+
+  private Modal modal { get; set; } = new();
+  private EditForm form { get; set; } = new();
+
+  private TokenProvider Token { get; set; } = new();
+
+  [Inject]
+  private ProductService Service { get; set; } = default!;
+
+  [Inject]
+  private PersistentComponentState PersistentComponentState { get; set; } = default!;
+
+  private class FilterRequest
+  {
+    public string Name { get; set; } = string.Empty;
+    public string TypeId { get; set; } = string.Empty;
+    public string BrandId { get; set; } = string.Empty;
+    public int PageIndex { get; set; } = 0;
+  }
+
+  private class InputRequest
+  {
+    public string Id { get; set; } = string.Empty;
+
+    [Required(ErrorMessage = "Phải nhập trường này")]
+    public string Name { get; set; } = string.Empty;
+
+    [Required(ErrorMessage = "Phải nhập trường này")]
+    [Range(0.0, double.MaxValue, ErrorMessage = "Giá trị tối thiểu phải lớn hơn hoặc bằng 0")]
+    public int AvailableStock { get; set; }
+
+    [Range(0.0, double.MaxValue, ErrorMessage = "Giá trị tối thiểu phải lớn hơn hoặc bằng 0")]
+    [Required(ErrorMessage = "Phải nhập trường này")]
+    public double Price { get; set; }
+
+    [Required(ErrorMessage = "Phải nhập trường này")]
+    public string PictureUri { get; set; } = string.Empty;
+
+    [Required(ErrorMessage = "Phải nhập trường này")]
+    public string BrandId { get; set; } = string.Empty;
+
+    [Required(ErrorMessage = "Phải nhập trường này")]
+    public string TypeId { get; set; } = string.Empty;
+    public string Description { get; set; } = string.Empty;
+  }
+
+  private async Task ResetFilter()
+  {
+    Request = new();
+    await Filter();
+  }
+
+  private async Task Filter()
+  {
+    var request = ToRequest(Request);
+    var response = await Service.GetProducts(request);
+
+    Products = response.Data!;
+  }
+
+  private async Task OpenCreateForm()
+  {
+    IsCreateNew = true;
+    Payload = new();
+    await modal.ShowAsync();
+  }
+
+  private async Task CreateProduct()
+  {
+    if (!form.EditContext?.Validate() ?? false)
+      return;
+
+    var request = new CreateProductRequest(
+      Payload.Name,
+      Payload.AvailableStock,
+      Payload.Price,
+      Payload.PictureUri,
+      Payload.BrandId,
+      Payload.TypeId,
+      Payload.Description
+    );
+
+    var result = await Service.CreateProduct(request, Token.AccessToken);
+    if(result.IsSuccess)
+    {
+      await modal.HideAsync();
+      ShowNotification();
+    }
+  }
+
+  private async Task ShowProductDetail(string id)
+  {
+    IsCreateNew = false;
+    SelectedProduct = id;
+
+    var response = await Service.GetProduct(id);
+    if (response.IsSuccess)
+    {
+      var data = response.Data!;
+      Payload = new InputRequest
+        {
+          Name = data.Name,
+          Price = data.Price,
+          AvailableStock = data.AvailableStock,
+          Description = data.Description,
+          PictureUri = data.PictureUri,
+          BrandId = data.BrandId,
+          TypeId = data.TypeId
+        };
+
+      await modal.ShowAsync();
+    }
+  }
+
+  private async Task EditProduct()
+  {
+    if (!form.EditContext?.Validate() ?? false)
+      return;
+
+    var request = new EditProductRequest(
+      Id: SelectedProduct,
+      Payload.Name,
+      Payload.AvailableStock,
+      Payload.Price,
+      Payload.PictureUri,
+      Payload.BrandId,
+      Payload.TypeId,
+      Payload.Description
+    );
+
+    var result = await Service.EditProduct(request, Token.AccessToken);
+    if (result.IsSuccess)
+    {
+      await modal.HideAsync();
+      ShowNotification();
+    }
+  }
+
+  private void ShowNotification()
+  {
+    var message = new ToastMessage
+      {
+        Type = ToastType.Secondary
+      };
+
+    message.Message = IsCreateNew ? "Thêm mới thành công" : "Thay đổi thành công";
+
+    Messages.Add(message);
+  }
+
+  private GetProductPaginationRequest ToRequest(FilterRequest rawRequest)
+  {
+    return new GetProductPaginationRequest
+      {
+        Name = rawRequest.Name,
+        PageIndex = rawRequest.PageIndex,
+        TypeId = rawRequest.TypeId,
+        Brands = [rawRequest.BrandId]
+      };
+  }
+
+  protected override async Task OnInitializedAsync()
+  {
+    if (PersistentComponentState.TryTakeFromJson<TokenProvider>("token", out TokenProvider? token))
+    {
+      Token = token ?? new();
+    }
+
+    var options = await Service.GetListOption();
+    BrandOptions = options.Data!.BrandOptions;
+    TypeOptions = options.Data!.TypeOptions;
+    await Filter();
+  }
+}

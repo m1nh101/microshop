@@ -37,7 +37,7 @@ public sealed class RequireAccessTokenEndpoint : Endpoint<RequireAccessTokenRequ
       await SendAsync(
         response: Errors.RefreshTokenIsNotValid,
         statusCode: 401,
-        cancellation: ct);
+        cancellation: ct); 
       return;
     }
 

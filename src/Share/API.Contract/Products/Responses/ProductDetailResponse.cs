@@ -6,4 +6,6 @@ public record ProductDetailResponse(
   double Price,
   int AvailableStock,
   string PictureUri,
+  string BrandId,
+  string TypeId,
   string Description);

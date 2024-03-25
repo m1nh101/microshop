@@ -1,5 +1,4 @@
-﻿using API.Contract.Users.Requests;
-using Client.Admin.Services;
+﻿using Client.Admin.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Client.Admin;
@@ -8,41 +7,17 @@ public static class ExternalAuthRoute
 {
   public static void UseExternalAuthRoute(this IEndpointRouteBuilder router)
   {
-    router.MapPost("/auth", Authenticate);
-    router.MapPost("/register", Register);
+    router.MapPost("/logout", SignOut);
   }
 
-  static async Task Authenticate(
-    HttpContext context,
-    UserService service)
+  static async Task SignOut(
+    UserService service,
+    HttpContext context)
   {
-    var request = new AuthenticateRequest(
-      Username: context.Request.Form["username"]!,
-      Password: context.Request.Form["password"]!);
+    await service.Signout();
 
-    var response = await service.Authenticate(request);
-
-    if(response.IsSuccess)
-    {
-      context.Response.Cookies.Append("access_token", response.Data!.AccessToken, new CookieOptions
-      {
-        SameSite = SameSiteMode.None,
-        HttpOnly = true,
-        Secure = true,
-      });
-
-      context.Response.Redirect("/");
-    }
-  }
-
-  static async Task Register(
-    [FromServices] UserService service,
-    [FromServices] HttpContext context,
-    [FromBody] RegisterRequest req)
-  {
-    var response = await service.Register(req);
-
-    if (response.IsSuccess)
-      context.Response.Redirect("/login");
+    context.Response.Cookies.Delete("refresh_token");
+    context.Response.Cookies.Delete("access_token");
+    context.Response.Redirect("/login");
   }
 }

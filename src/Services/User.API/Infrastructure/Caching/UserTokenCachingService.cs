@@ -18,4 +18,11 @@ public sealed class UserTokenCachingService
   {
     return await _tokens.FirstOrDefaultAsync(e => e.RefreshToken == refreshToken);
   }
+
+  public async Task RevokeRefreshToken(string userId)
+  {
+    var token = await _tokens.FirstOrDefaultAsync(e => e.UserId == userId);
+    if (token is null) return;
+    await _tokens.DeleteAsync(token);
+  }
 }

@@ -1,23 +1,56 @@
 ﻿@inherits LayoutComponentBase
 
 <div class="page">
-    <div class="sidebar">
-        <NavMenu />
+  <div class="sidebar">
+    <NavMenu />
+  </div>
+
+  <main>
+    <div class="top-row px-4">
+      <a href="/login" target="_blank">Đăng nhập</a>
+      <Microsoft.AspNetCore.Components.Authorization.AuthorizeView>
+        <form method="post" action="/logout">
+          <input type="submit" value="Đăng xuất" class="btn btn-link" />
+        </form>
+      </Microsoft.AspNetCore.Components.Authorization.AuthorizeView>
     </div>
 
-    <main>
-        <div class="top-row px-4">
-            <a href="https://learn.microsoft.com/aspnet/core/" target="_blank">About</a>
-        </div>
-
-        <article class="content px-4">
-            @Body
-        </article>
-    </main>
+    <article class="content px-4">
+      @Body
+    </article>
+  </main>
 </div>
 
 <div id="blazor-error-ui">
-    An unhandled error has occurred.
-    <a href="" class="reload">Reload</a>
-    <a class="dismiss">🗙</a>
+  An unhandled error has occurred.
+  <a href="" class="reload">Reload</a>
+  <a class="dismiss">🗙</a>
 </div>
+
+@code {
+  [CascadingParameter]
+  private HttpContext HttpContext { get; set; } = default!;
+
+  [Inject]
+  private PersistentComponentState PersistentComponentState { get; set; } = default!;
+
+  private TokenProvider Token { get; set; } = new();
+
+  protected override void OnInitialized()
+  {
+    var accessToken = HttpContext.Request.Cookies["access_token"]?.ToString()
+      ?? HttpContext.Request.Headers.Authorization.ToString();
+
+    if (!string.IsNullOrEmpty(accessToken))
+    {
+      Token.AccessToken = accessToken;
+      PersistentComponentState.RegisterOnPersisting(() =>
+      {
+        PersistentComponentState.PersistAsJson("token", Token);
+        return Task.CompletedTask;
+      });
+    }
+
+    base.OnInitialized();
+  }
+}

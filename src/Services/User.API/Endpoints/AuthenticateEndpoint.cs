@@ -20,6 +20,7 @@ public sealed class AuthenticateEndpoint : Endpoint<AuthenticateRequest, Result<
   private readonly IPasswordGenerator _passwordGenerator;
   private readonly IAccessTokenGenerator _accessTokenGenerator;
   private readonly IRefreshTokenGenerator _refreshTokenGenerator;
+  private readonly IConfiguration _configuration;
 
 
   public AuthenticateEndpoint(
@@ -27,13 +28,15 @@ public sealed class AuthenticateEndpoint : Endpoint<AuthenticateRequest, Result<
     IPasswordGenerator passwordGenerator,
     IAccessTokenGenerator accessTokenGenerator,
     IRefreshTokenGenerator refreshTokenGenerator,
-    UserTokenCachingService cache)
+    UserTokenCachingService cache,
+    IConfiguration configuration)
   {
     _context = context;
     _passwordGenerator = passwordGenerator;
     _accessTokenGenerator = accessTokenGenerator;
     _refreshTokenGenerator = refreshTokenGenerator;
     _cache = cache;
+    _configuration = configuration;
   }
 
   public override async Task HandleAsync(AuthenticateRequest req, CancellationToken ct)
@@ -75,14 +78,34 @@ public sealed class AuthenticateEndpoint : Endpoint<AuthenticateRequest, Result<
 
     // generate access token
     var accessToken = _accessTokenGenerator.Generate(user, roles);
+    var refreshToken = _refreshTokenGenerator.Generate();
     var userToken = new UserToken()
     {
       UserId = user.Id,
-      RefreshToken = _refreshTokenGenerator.Generate()
+      RefreshToken = refreshToken
     };
 
     // store access token to cache system
     await _cache.AddUserToken(userToken);
+
+    // write http-cookie to response
+    HttpContext.Response.Cookies.Append("access_token", accessToken, new CookieOptions
+    {
+      Path = "/",
+      Secure = true,
+      SameSite = SameSiteMode.None,
+      HttpOnly = true,
+      Expires = DateTime.UtcNow.AddSeconds(Convert.ToInt32(_configuration["Token:ExpiredIn"]))
+    });
+
+    HttpContext.Response.Cookies.Append("refresh_token", refreshToken, new CookieOptions
+    {
+      Path = "/token",
+      Secure = true,
+      SameSite = SameSiteMode.None,
+      HttpOnly = true,
+      Expires = DateTime.UtcNow.AddDays(7)
+    });
 
     await SendAsync(
       response: Result<AuthenticateResponse>.Ok(new(user.Id, accessToken, userToken.RefreshToken)),

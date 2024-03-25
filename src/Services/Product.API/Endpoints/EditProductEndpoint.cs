@@ -48,6 +48,8 @@ public sealed class EditProductEndpoint : Endpoint<EditProductRequest, Result<Pr
           Price: product.Price,
           AvailableStock: product.AvailableStock,
           PictureUri: product.PictureUri,
+          BrandId: product.BrandId,
+          TypeId: product.TypeId,
           Description: product.Description);
 
         await SendAsync(

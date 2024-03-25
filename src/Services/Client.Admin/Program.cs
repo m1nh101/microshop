@@ -2,7 +2,6 @@ using Auth;
 using Client.Admin;
 using Client.Admin.Components;
 using Client.Admin.Services;
-using CsvHelper;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,10 +11,19 @@ builder.Services.AddRazorComponents()
 
 builder.Services.AddJwt(builder.Configuration);
 
+builder.Services.AddHttpContextAccessor();
+
 builder.Services.AddHttpClient<UserService>(client =>
 {
   client.BaseAddress = new Uri("https://localhost:7168");
 });
+
+builder.Services.AddHttpClient<ProductService>(client =>
+{
+  client.BaseAddress = new Uri("https://localhost:7168");
+});
+
+builder.Services.AddBlazorBootstrap();
 
 var app = builder.Build();
 
