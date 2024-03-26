@@ -1,5 +1,4 @@
-﻿using Common.IO;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Product.API.Infrastructure.Entities;
 
 namespace Product.API.Infrastructure.Database;
@@ -19,7 +18,7 @@ public class DatabaseMigrator
     var context = scope.ServiceProvider.GetRequiredService<ProductDbContext>();
 
     var pendingMigrations = await context.Database.GetPendingMigrationsAsync();
-    if(pendingMigrations.Any())
+    if (pendingMigrations.Any())
     {
       await context.Database.MigrateAsync();
 
@@ -32,18 +31,20 @@ public class DatabaseMigrator
 
   static async Task SeedProduct(ProductDbContext context, ProductType[] types, ProductBrand[] brands)
   {
-    FileReader reader = new CsvFileReader();
     var random = new Random();
-    var filePath = Path.Combine(Directory.GetCurrentDirectory(), "Sources", "product.csv");
-    var source = reader.Read<ProductCsvRecord>(filePath);
-    var products = source.Select(e => new ProductItem(
-      e.Name,
-      e.AvailableStock,
-      e.Price,
-      e.PictureUri,
-      brands[random.Next(0, brands.Length)],
-      types[random.Next(0, types.Length)],
-      e.Description));
+    var products = new ProductItem[]
+    {
+      new("Áo phông hè 2020", 10, 100000, "https://empty", brands[random.Next(0, brands.Length)], types[random.Next(0, types.Length)]),
+      new("Áo phông hè 2021", 5, 150000, "https://empty", brands[random.Next(0, brands.Length)], types[random.Next(0, types.Length)]),
+      new("Áo phông hè 2022", 1, 123000, "https://empty", brands[random.Next(0, brands.Length)], types[random.Next(0, types.Length)]),
+      new("Áo phông hè 2023", 23, 234000, "https://empty", brands[random.Next(0, brands.Length)], types[random.Next(0, types.Length)]),
+      new("Quần short hè 2020", 3, 5420000, "https://empty", brands[random.Next(0, brands.Length)], types[random.Next(0, types.Length)]),
+      new("Quần short hè 2021", 12, 120000, "https://empty", brands[random.Next(0, brands.Length)], types[random.Next(0, types.Length)]),
+      new("Điện thoại Android 2021", 50, 120000, "https://empty", brands[random.Next(0, brands.Length)], types[random.Next(0, types.Length)]),
+      new("FruitPhone 2022", 12, 591200, "https://empty", brands[random.Next(0, brands.Length)], types[random.Next(0, types.Length)]),
+      new("FruitPhone 2023", 80, 243200, "https://empty", brands[random.Next(0, brands.Length)], types[random.Next(0, types.Length)]),
+      new("MacPhone 2023", 10, 123400, "https://empty", brands[random.Next(0, brands.Length)], types[random.Next(0, types.Length)]),
+    };
 
     await context.Products.AddRangeAsync(products);
     await context.SaveChangesAsync();
@@ -51,10 +52,13 @@ public class DatabaseMigrator
 
   static ProductBrand[] SeedingBrand()
   {
-    var filePath = Path.Combine(Directory.GetCurrentDirectory(), "Sources", "brand.csv");
-    var brands = File.ReadAllLines(filePath).Select(e => new ProductBrand(e));
-
-    return brands.ToArray();
+    return [
+      new ProductBrand("Nike"),
+      new ProductBrand("Adidas"),
+      new ProductBrand("Apple"),
+      new ProductBrand("Samsung"),
+      new ProductBrand("Amazone"),
+    ];
   }
 
   static ProductType[] SeedingType()

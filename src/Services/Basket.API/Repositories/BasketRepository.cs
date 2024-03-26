@@ -28,7 +28,7 @@ public class BasketRepository : IBasketRepository
   public async Task RemoveBasket(string customerId)
   {
     var basket = await GetBasket(customerId);
-    if(basket is not null)
+    if (basket is not null)
       await _baskets.DeleteAsync(basket);
   }
 

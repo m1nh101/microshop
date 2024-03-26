@@ -18,7 +18,7 @@ builder.Services.AddSingleton<IRedisConnectionProvider>(sp =>
 {
   var configuration = new RedisConnectionConfiguration
   {
-    Host = builder.Configuration.GetConnectionString("RedisConnection") ?? throw new NullReferenceException(),
+    Host = builder.Configuration["REDIS_SERVER"] ?? builder.Configuration.GetConnectionString("RedisConnection") ?? throw new Exception(),
     Port = 6379
   };
 

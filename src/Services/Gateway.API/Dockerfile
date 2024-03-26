@@ -9,10 +9,11 @@ EXPOSE 8081
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
-COPY ["src/Communication/Gateway.API/Gateway.API.csproj", "src/Communication/Gateway.API/"]
-RUN dotnet restore "./src/Communication/Gateway.API/./Gateway.API.csproj"
+COPY ["src/Services/Gateway.API/Gateway.API.csproj", "src/Services/Gateway.API/"]
+COPY ["src/Services/Gateway.API/config.yml", "src/Services/Gateway.API/"]
+RUN dotnet restore "./src/Services/Gateway.API/./Gateway.API.csproj"
 COPY . .
-WORKDIR "/src/src/Communication/Gateway.API"
+WORKDIR "/src/src/Services/Gateway.API"
 RUN dotnet build "./Gateway.API.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
 FROM build AS publish

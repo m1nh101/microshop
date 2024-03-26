@@ -1,5 +1,4 @@
 ﻿using Client.Admin.Services;
-using Microsoft.AspNetCore.Mvc;
 
 namespace Client.Admin;
 

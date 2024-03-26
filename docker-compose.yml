@@ -2,11 +2,121 @@
 
 version: '3.4'
 
+x-config: &config
+  environment:
+    - DB_SERVER=db
+    - REDIS_SERVER=redis
+    - SECRET_KEY=6PNe4LEC5h9AH5ekt6ggRrpL1L1FwwkP
+    - PASSWORD_SALT=87b7U2lJ6LVrs9bva7puKVuJbWaiF4qa
+    - ASPNETCORE_ENVIRONMENT=Development
+    - ASPNETCORE_URLS=https://+:443
+    - ASPNETCORE_Kestrel__Certificates__Default__Password=M1ng@2002
+    - ASPNETCORE_Kestrel__Certificates__Default__Path=/https/aspnetapp.pfx
+  volumes:
+    - ~/.aspnet/https:/https:ro
+
+networks:
+  shop_net:
+    driver: bridge
+
 services:
   gatewayapi:
     image: gatewayapi
     build:
       context: .
-      dockerfile: src/Communication/Gateway.API/Dockerfile
+      dockerfile: src/Services/Gateway.API/Dockerfile
+    <<: *config
+    networks:
+      - shop_net
     ports:
-      - 5144:5144
+      - 7168:443
+
+  basket-api:
+    image: basket-api
+    build:
+      context: .
+      dockerfile: src/Services/Basket.API/Dockerfile
+    <<: *config
+    networks:
+      - shop_net
+    # ports:
+    #   - 7204:443
+    depends_on:
+      - redis
+
+  user-api:
+    image: user-api
+    build:
+      context: .
+      dockerfile: src/Services/User.API/Dockerfile
+    <<: *config
+    networks:
+      - shop_net
+    # ports:
+    #   - 7100:443
+    depends_on:
+      - redis
+      - db
+
+  product-api:
+    image: product-api
+    build:
+      context: .
+      dockerfile: src/Services/Product.API/Dockerfile
+    <<: *config
+    networks:
+      - shop_net
+    # ports:
+    #   - 7295:443
+    depends_on:
+      - db
+ 
+  admin-client:
+    image: admin-client
+    build:
+      context: .
+      dockerfile: src/Services/Client.Admin/Dockerfile
+    environment:
+      - SECRET_KEY=6PNe4LEC5h9AH5ekt6ggRrpL1L1FwwkP
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=https://+:443
+      - ASPNETCORE_Kestrel__Certificates__Default__Password=M1ng@2002
+      - ASPNETCORE_Kestrel__Certificates__Default__Path=/https/aspnetapp.pfx
+      - SERVER=gatewayapi
+    volumes:
+      - ~/.aspnet/https:/https:ro
+    networks:
+      - shop_net
+    ports:
+      - 7030:443
+
+  order-api:
+    image: order-api
+    build:
+      context: .
+      dockerfile: src/Services/Order.API/Dockerfile
+    <<: *config
+    networks:
+      - shop_net
+    # ports:
+    #   - 7003:443
+    depends_on:
+      - redis
+      - db
+
+  redis:
+    image: redis/redis-stack
+    networks:
+      - shop_net
+    expose:
+      - 6379
+  db:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=M1ng@2002
+    networks:
+      - shop_net
+    expose:
+      - 1433
+   

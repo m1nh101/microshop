@@ -1,3 +1,6 @@
-﻿namespace Order.API.Http.Requests;
+﻿using Order.API.Infrastructure.Entities;
 
-public record CreateOrderRequest;
+namespace Order.API.Http.Requests;
+
+public record CreateOrderRequest(
+  ShippingAddress ShippingAddress);

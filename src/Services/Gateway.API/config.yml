@@ -21,22 +21,45 @@
       Transforms:
         - PathRemovePrefix: /basket-api
         - PathPrefix: /api
+    OrderService:
+      ClusterId: OrderService
+      Match:
+        Path: "/order-api/{**catch-all}"
+      Transforms:
+        - PathRemovePrefix: /order-api
+        - PathPrefix: /api
   Clusters:
     UserService:
+      HttpClient:
+        DangerousAcceptAnyServerCertificate: true
+      LoadBalancingPolicy": RoundRobin
       Destinations:
-        UserService-1:
-          Address: https://localhost:7100
+        # UserService-1:
+        #   Address: https://localhost:7100
         UserService-2:
-          Address: http://localhost:5236
+          Address: https://user-api:443
     ProductService:
+      HttpClient:
+        DangerousAcceptAnyServerCertificate: true
+      LoadBalancingPolicy": RoundRobin
       Destinations:
-        ProductService-1:
-          Address: https://localhost:7295
+        # ProductService-1:
+        #   Address: https://localhost:7295
         ProductService-2:
-          Address: http://localhost:5138
+          Address: https://product-api:443
     BasketService:
+      HttpClient:
+        DangerousAcceptAnyServerCertificate: true
+      LoadBalancingPolicy": RoundRobin
       Destinations:
-        BasketService-1:
-          Address: https://localhost:7024
+        # BasketService-1:
+        #   Address: https://localhost:7024
         BasketService-2:
-          Address: http://localhost:5188
+          Address: https://basket-api:443
+    OrderService:
+      LoadBalancingPolicy": RoundRobin
+      Destinations:
+        # OrderService-1:
+        #   Address: https://localhost:7003
+        OrderService-2:
+          Address: https://order-api:443

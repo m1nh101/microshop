@@ -14,14 +14,18 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddDbContext<UserDbContext>(opt =>
 {
-  opt.UseSqlServer(builder.Configuration.GetConnectionString("UserConnection"));
+  var server = builder.Configuration["DB_SERVER"] ?? "127.0.0.1";
+  var connectionString = $"Server={server};Database=UserDb;UID=sa;PWD=M1ng@2002;Encrypt=False";
+
+  //opt.UseSqlServer(builder.Configuration.GetConnectionString("OrderConnection"));
+  opt.UseSqlServer(connectionString);
 });
 
 builder.Services.AddSingleton<IRedisConnectionProvider>(sp =>
 {
   var connection = new RedisConnectionConfiguration
   {
-    Host = builder.Configuration.GetConnectionString("RedisConnection") ?? throw new NullReferenceException(),
+    Host = builder.Configuration["REDIS_SERVER"] ?? builder.Configuration.GetConnectionString("RedisConnection") ?? throw new NullReferenceException(),
     Port = 6379
   };
 

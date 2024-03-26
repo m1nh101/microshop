@@ -2,41 +2,43 @@
 using API.Contract.Products.Responses;
 using Common;
 using FastEndpoints;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Product.API.Infrastructure.Database;
 
 namespace Product.API.Endpoints;
 
 [HttpDelete("/api/products/{id}")]
+[Authorize(Roles = "admin")]
 public sealed class RemoveProductEndpoint : Endpoint<RemoveProductRequest, Result<RemoveProductResponse>>
 {
-    private readonly ProductDbContext _context;
+  private readonly ProductDbContext _context;
 
-    public RemoveProductEndpoint(ProductDbContext context)
+  public RemoveProductEndpoint(ProductDbContext context)
+  {
+    _context = context;
+  }
+
+  public override async Task HandleAsync(RemoveProductRequest req, CancellationToken ct)
+  {
+    var product = await _context.Products.FirstOrDefaultAsync(e => e.Id == req.Id, ct);
+
+    if (product == null)
     {
-        _context = context;
+      await SendAsync(
+        response: Errors.ProductNotFound,
+        statusCode: 400,
+        cancellation: ct);
+      return;
     }
 
-    public override async Task HandleAsync(RemoveProductRequest req, CancellationToken ct)
-    {
-        var product = await _context.Products.FirstOrDefaultAsync(e => e.Id == req.Id, ct);
+    product.UpdateAvailableStatus(false);
 
-        if (product == null)
-        {
-            await SendAsync(
-              response: Errors.ProductNotFound,
-              statusCode: 400,
-              cancellation: ct);
-            return;
-        }
+    await _context.SaveChangesAsync(ct);
 
-        product.UpdateAvailableStatus(false);
-
-        await _context.SaveChangesAsync(ct);
-
-        await SendAsync(
-          response: new RemoveProductResponse(),
-          statusCode: 200,
-          cancellation: ct);
-    }
+    await SendAsync(
+      response: new RemoveProductResponse(),
+      statusCode: 200,
+      cancellation: ct);
+  }
 }

@@ -27,7 +27,7 @@ public class User
   public string Password { get; private set; } = string.Empty;
 
   public virtual ICollection<UserRole> Roles { get; private set; } = [];
-  
+
 
   public void AddToRole(string roleId) => Roles.Add(new UserRole(roleId));
 }

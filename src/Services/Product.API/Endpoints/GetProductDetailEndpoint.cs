@@ -12,41 +12,41 @@ namespace Product.API.Endpoints;
 [AllowAnonymous]
 public class GetProductDetailEndpoint : Endpoint<GetProductByIdRequest, Result<ProductDetailResponse>>
 {
-    private readonly ProductDbContext _context;
+  private readonly ProductDbContext _context;
 
-    public GetProductDetailEndpoint(ProductDbContext context)
+  public GetProductDetailEndpoint(ProductDbContext context)
+  {
+    _context = context;
+  }
+
+  public override async Task HandleAsync(GetProductByIdRequest req, CancellationToken ct)
+  {
+    var product = await _context.Products
+      .AsNoTracking()
+      .Where(e => e.Id == req.Id)
+      .Select(e => new ProductDetailResponse(
+        e.Id,
+        e.Name,
+        e.Price,
+        e.AvailableStock,
+        e.PictureUri,
+        e.BrandId,
+        e.TypeId,
+        e.Description))
+      .FirstOrDefaultAsync();
+
+    if (product is null)
     {
-        _context = context;
+      await SendAsync(
+        response: Errors.ProductNotFound,
+        statusCode: 404,
+        cancellation: ct);
+      return;
     }
 
-    public override async Task HandleAsync(GetProductByIdRequest req, CancellationToken ct)
-    {
-        var product = await _context.Products
-          .AsNoTracking()
-          .Where(e => e.Id == req.Id)
-          .Select(e => new ProductDetailResponse(
-            e.Id,
-            e.Name,
-            e.Price,
-            e.AvailableStock,
-            e.PictureUri,
-            e.BrandId,
-            e.TypeId,
-            e.Description))
-          .FirstOrDefaultAsync();
-
-        if (product is null)
-        {
-            await SendAsync(
-              response: Errors.ProductNotFound,
-              statusCode: 404,
-              cancellation: ct);
-            return;
-        }
-
-        await SendAsync(
-            response: product,
-            statusCode: 200,
-            cancellation: ct);
-    }
+    await SendAsync(
+        response: product,
+        statusCode: 200,
+        cancellation: ct);
+  }
 }

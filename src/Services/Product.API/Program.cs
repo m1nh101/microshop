@@ -18,7 +18,11 @@ builder.Services.AddFastEndpoints().SwaggerDocument();
 
 builder.Services.AddDbContext<ProductDbContext>(opt =>
 {
-  opt.UseSqlServer(builder.Configuration.GetConnectionString("ProductConnection"));
+  var server = builder.Configuration["DB_SERVER"] ?? "127.0.0.1";
+  var connectionString = $"Server={server};Database=ProductDb;UID=sa;PWD=M1ng@2002;Encrypt=False";
+
+  //opt.UseSqlServer(builder.Configuration.GetConnectionString("OrderConnection"));
+  opt.UseSqlServer(connectionString);
 });
 
 builder.Services.AddSingleton<DatabaseMigrator>();

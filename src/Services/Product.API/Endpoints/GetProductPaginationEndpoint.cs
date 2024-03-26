@@ -23,7 +23,10 @@ public class GetProductPaginationEndpoint : Endpoint<GetProductPaginationRequest
 
   public override async Task HandleAsync(GetProductPaginationRequest req, CancellationToken ct)
   {
-    var query = _context.Products.AsNoTracking();
+    var query = _context.Products
+      .Include(e => e.Type)
+      .Include(e => e.Brand)
+      .AsNoTracking();
     var brands = req.Brands?.Where(e => !string.IsNullOrEmpty(e)).ToList();
 
     if (!string.IsNullOrEmpty(req.Name))
@@ -40,6 +43,8 @@ public class GetProductPaginationEndpoint : Endpoint<GetProductPaginationRequest
         e.Id,
         e.Name,
         e.Price,
+        e.Brand.Name,
+        e.Type.Name,
         e.PictureUri,
         e.Description))
       .ToListAsync(ct);

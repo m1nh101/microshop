@@ -15,13 +15,23 @@ builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddHttpClient<UserService>(client =>
 {
-  client.BaseAddress = new Uri("https://localhost:7168");
-});
+  var host = builder.Configuration["SERVER"] ?? "apigateway";
+
+  client.BaseAddress = new Uri($"https://{host}:443");
+}).ConfigurePrimaryHttpMessageHandler(_ => new HttpClientHandler
+{
+  ServerCertificateCustomValidationCallback = (sender, cert, chain, sslPolicyErrors) => { return true; }
+}); ;
 
 builder.Services.AddHttpClient<ProductService>(client =>
 {
-  client.BaseAddress = new Uri("https://localhost:7168");
-});
+  var host = builder.Configuration["SERVER"] ?? "apigateway";
+
+  client.BaseAddress = new Uri($"https://{host}:443");
+}).ConfigurePrimaryHttpMessageHandler(_ => new HttpClientHandler
+{
+  ServerCertificateCustomValidationCallback = (sender, cert, chain, sslPolicyErrors) => { return true; }
+}); ;
 
 builder.Services.AddBlazorBootstrap();
 

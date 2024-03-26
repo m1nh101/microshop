@@ -27,6 +27,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "API.Contract", "src\Share\A
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Client.Admin", "src\Services\Client.Admin\Client.Admin.csproj", "{6E961459-D774-4B71-9C32-7553C95DE825}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Files", "Solution Files", "{60D986C7-65D3-4B58-BE9A-4A330C9E0C2F}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+		docker-compose.yml = docker-compose.yml
+		README.md = README.md
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

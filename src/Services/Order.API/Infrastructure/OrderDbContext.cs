@@ -1,29 +1,33 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Order.API.Entities;
+using Order.API.Infrastructure.Entities;
 
 namespace Order.API.Infrastructure;
 
 public class OrderDbContext : DbContext
 {
-    public OrderDbContext(DbContextOptions<OrderDbContext> options)
-      : base(options)
+  public OrderDbContext(DbContextOptions<OrderDbContext> options)
+    : base(options)
+  {
+  }
+
+  protected override void OnModelCreating(ModelBuilder modelBuilder)
+  {
+    base.OnModelCreating(modelBuilder);
+
+    modelBuilder.Entity<BuyerOrder>(cfg =>
     {
-    }
+      cfg.ToTable("Orders");
+      cfg.HasKey(e => e.Id);
 
-    protected override void OnModelCreating(ModelBuilder modelBuilder)
-    {
-        base.OnModelCreating(modelBuilder);
+      cfg.OwnsMany(e => e.Items)
+        .WithOwner()
+        .HasForeignKey("OrderId");
 
-        modelBuilder.Entity<BuyerOrder>(cfg =>
-        {
-            cfg.ToTable("Order");
-            cfg.HasKey(e => e.Id);
+      cfg.OwnsOne(e => e.ShippingAddress)
+        .WithOwner()
+        .HasForeignKey("OrderId");
+    });
+  }
 
-            cfg.OwnsMany(e => e.Items)
-          .WithOwner()
-          .HasForeignKey("OrderId");
-        });
-    }
-
-    public virtual DbSet<BuyerOrder> Orders => Set<BuyerOrder>();
+  public virtual DbSet<BuyerOrder> Orders => Set<BuyerOrder>();
 }

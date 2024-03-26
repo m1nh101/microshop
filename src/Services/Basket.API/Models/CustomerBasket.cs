@@ -8,7 +8,7 @@ public class CustomerBasket
 {
   [RedisIdField, Indexed]
   public string CustomerId { get; set; } = string.Empty;
-  
+
   public List<BasketItem> Items { get; set; } = [];
 
   public void AddOrUpdate(BasketItem item)

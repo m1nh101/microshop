@@ -1,8 +1,8 @@
 ﻿using Auth;
 using FastEndpoints;
-using Order.API.Entities;
 using Order.API.Http.Requests;
 using Order.API.Infrastructure;
+using Order.API.Infrastructure.Entities;
 using Order.API.RPC.Clients;
 
 namespace Order.API.Http.Endpoints;
@@ -27,8 +27,17 @@ public sealed class CreateOrderRequestHandler : Endpoint<CreateOrderRequest>
   public override async Task HandleAsync(CreateOrderRequest req, CancellationToken ct)
   {
     var itemsInBasket = await _basketClient.GetBasket(_session.UserId);
+    if(itemsInBasket == null || !itemsInBasket.Any())
+    {
+      await SendAsync(
+        response: Errors.EmptyBasket,
+        statusCode: 202,
+        cancellation: ct);
+      return;
+    }
+
     var items = itemsInBasket.Select(e => new OrderItem(e.ProductId, e.ProductName, e.PictureUri, e.Price, e.Quantity));
-    var basket = new BuyerOrder(_session.UserId, items);
+    var basket = new BuyerOrder(_session.UserId, req.ShippingAddress, items);
 
     await _context.Orders.AddAsync(basket, ct);
     await _context.SaveChangesAsync(ct);

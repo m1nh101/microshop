@@ -13,7 +13,7 @@ public class ProductRpcClient
 
   public async Task<GetProductReply> GetProduct(string productId)
   {
-    return await _client.GetProductAsync(new GetProductDetailRequest { ProductId = productId});
+    return await _client.GetProductAsync(new GetProductDetailRequest { ProductId = productId });
   }
 
   public async Task<GetProductInBasketReply> GetProducts(params string[] productIds)

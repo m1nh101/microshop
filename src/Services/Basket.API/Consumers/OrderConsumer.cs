@@ -23,7 +23,7 @@ public class OrderConsumer : IHostedService
       var message = Encoding.UTF8.GetString(body);
       var payload = JsonConvert.DeserializeObject<OrderStartedEvent>(message);
 
-      if(payload is not null)
+      if (payload is not null)
         await payload.ExecuteAsync();
     };
 
