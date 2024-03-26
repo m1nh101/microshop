@@ -4,3 +4,6 @@
 obj/
 bin/
 *.ps1
+
+node_modules/
+.angular

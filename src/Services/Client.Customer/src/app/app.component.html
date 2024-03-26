@@ -1,0 +1,15 @@
+<nz-layout>
+  <nz-header style="position: sticky; top: 0;">
+    <nz-space nzAlign="end" style="width: 100%; justify-content: end;">
+      <button nz-button nzType="link" routerLink="login">Đăng nhập</button>
+      <button nz-button nzType="link" routerLink="register">Đăng ký</button>
+    </nz-space>
+  </nz-header>
+  <nz-layout>
+    <!-- <nz-sider>Sider</nz-sider> -->
+    <nz-content style="padding: 1rem 1rem 0rem 1rem">
+      <router-outlet />
+    </nz-content>
+  </nz-layout>
+  <!-- <nz-footer>Footer</nz-footer> -->
+</nz-layout>
