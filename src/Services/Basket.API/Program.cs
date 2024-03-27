@@ -3,6 +3,7 @@ using Basket.API.HostedServices;
 using Basket.API.Repositories;
 using Basket.API.RPC.Clients;
 using FastEndpoints;
+using Grpc.Net.Client;
 using Redis.OM;
 using Redis.OM.Contracts;
 
@@ -27,7 +28,19 @@ builder.Services.AddSingleton<IRedisConnectionProvider>(sp =>
 
 builder.Services.AddSingleton(sp =>
 {
-  return new ProductRpcClient(() => "https://localhost:7295");
+  var handler = new HttpClientHandler
+  {
+    ServerCertificateCustomValidationCallback =
+      HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
+  };
+  var option = new GrpcChannelOptions
+  {
+    HttpHandler = handler
+  };
+  var channel = GrpcChannel.ForAddress("https://product-api:443", option);
+  var grpcClient = new ProductRpc.ProductRpcClient(channel);
+
+  return new ProductRpcClient(grpcClient);
 });
 
 builder.Services.AddJwt(builder.Configuration);

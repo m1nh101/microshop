@@ -1,1 +1,33 @@
-<p>cart works!</p>
+<h4 style="text-align: center; font-size: 16px;" *ngIf="isCartEmpty; else displayCart">Giỏ hàng trống</h4>
+<ng-template #displayCart>
+  <div nz-row  >
+    <nz-space nz-col nzSpan="12" nzDirection="vertical">
+      <div nz-row *ngFor="let item of cart.items; let index = index;">
+        <div nz-col nzSpan="4" style="width: 150px; height: 100px;"></div>
+        <div nz-col nzSpan="8">
+          <h4>{{item.productName}}</h4>
+          <p>Đơn giá: {{item.price}}</p>
+          <p>Tổng: {{item.price * item.quantity}}</p>
+        </div>
+        <div nz-col nzSpan="8">
+          <nz-space nzDirection="horizontal">
+            <button nz-button type="primary" (click)="onReduceQuantityClick(item.productId)">-</button>
+            <input nz-input type="number" [(ngModel)]="cart.items[index].quantity" (change)="onQuantityInputChange(item.productId, $event)"/>
+            <button nz-button type="primary" (click)="onIncreaseQuantityClick(item.productId)">+</button>
+          </nz-space>
+        </div>
+        <div nz-col nzSpan="4">
+          <button nz-button type="primary" nzDanger (click)="onRemoveItemClick(item.productId)">Xóa</button>
+        </div>
+      </div>
+    </nz-space>
+    <nz-space nz-col nzSpan="8" nzOffset="4" >
+      <div>
+        <p>Tổng giá: {{cart.totalPrice}}</p>
+        <p>Khuyến mãi: 0</p>
+        <nz-divider />
+        <p style="font-size: 16px;">Tổng giá: {{cart.totalPrice}}</p>
+      </div>
+    </nz-space>
+  </div>
+</ng-template>

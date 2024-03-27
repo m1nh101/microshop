@@ -56,7 +56,6 @@ public sealed class AddOrUpdateBasketItemEndpoint : Endpoint<AddOrUpdateBasketIt
     {
       ProductId = product.ProductId,
       ProductName = product.Name,
-      Description = product.Description,
       PictureUri = product.PictureUri,
     };
 
@@ -77,7 +76,9 @@ public sealed class AddOrUpdateBasketItemEndpoint : Endpoint<AddOrUpdateBasketIt
     var response = new BasketChangedResponse()
     {
       ProductId = req.ProductId,
-      TotalItemPrice = basketItem.ToPrice()
+      NewTotalItemPrice = basketItem.ToPrice(),
+      NewQuantity = req.Quantity,
+      NewTotalBasketPrice = basket.TotalPrice
     };
 
     await SendAsync(

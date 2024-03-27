@@ -32,7 +32,7 @@ public sealed class RemoveBasketItemEndpoint : Endpoint<RemoveBasketItemRequest,
     }
 
     var error = basket.RemoveItem(req.ProductId);
-    if (error is not null)
+    if (!error.Equals(Error.None))
     {
       await SendAsync(
         response: error,
@@ -42,8 +42,16 @@ public sealed class RemoveBasketItemEndpoint : Endpoint<RemoveBasketItemRequest,
     }
 
     await _repository.UpdateBasket(basket);
+
+    var data = new BasketChangedResponse
+    {
+      ProductId = req.ProductId,
+      NewQuantity = 0,
+      NewTotalItemPrice = 0,
+      NewTotalBasketPrice = basket.TotalPrice
+    };
     await SendAsync(
-      response: new BasketChangedResponse() { ProductId = req.ProductId, TotalItemPrice = 0 },
+      response: data,
       statusCode: 200,
       cancellation: ct);
   }

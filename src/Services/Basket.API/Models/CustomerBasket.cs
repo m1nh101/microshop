@@ -10,6 +10,7 @@ public class CustomerBasket
   public string CustomerId { get; set; } = string.Empty;
 
   public List<BasketItem> Items { get; set; } = [];
+  public double TotalPrice => Items.Sum(e => e.ToPrice());
 
   public void AddOrUpdate(BasketItem item)
   {
@@ -22,7 +23,6 @@ public class CustomerBasket
       existItem.SetPrice(item.Price);
     }
   }
-
   public Error RemoveItem(string productId)
   {
     var item = Items.FirstOrDefault(e => e.ProductId == productId);
@@ -32,6 +32,4 @@ public class CustomerBasket
     Items.Remove(item);
     return Error.None;
   }
-
-  public double GetTotalPrice() => Items.Sum(e => e.ToPrice());
 }

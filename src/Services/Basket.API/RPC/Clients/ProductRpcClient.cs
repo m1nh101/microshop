@@ -6,9 +6,9 @@ public class ProductRpcClient
 {
   private readonly ProductRpc.ProductRpcClient _client;
 
-  public ProductRpcClient(Func<string> option)
+  public ProductRpcClient(ProductRpc.ProductRpcClient client)
   {
-    _client = new(GrpcChannel.ForAddress(option.Invoke()));
+    _client = client;
   }
 
   public async Task<GetProductReply> GetProduct(string productId)

@@ -6,6 +6,7 @@ import { Observable } from "rxjs";
 
 type Cart = {
   customerId: string;
+  totalPrice: number;
   items: Array<CartItem>
 }
 
@@ -17,12 +18,14 @@ type CartItem = {
   pictureUri: string;
 }
 
-type CartUpdated = {
+type CartUpdatedInfo = {
   productId: string;
-  totalItemPrice: number;
+  newQuantity: number;
+  newTotalItemPrice: number;
+  newTotalBasketPrice: number;
 }
 
-type CartUpdatedResponse = Result<CartUpdated>;
+type CartUpdatedResponse = Result<CartUpdatedInfo>;
 
 type CartResponse = Result<Cart>
 
@@ -44,7 +47,7 @@ class CartService {
 
   getCart(): Observable<CartResponse> {
     const header = new HttpHeaders({
-      'ContentType': 'application/json',
+      'Content-Type': 'application/json',
       'Authorization': `Bearer ${this.authProvider.getAccessToken()}`
     });
     return this.httpClient.get<CartResponse>(`${this._rootUrl}/baskets`, { headers: header });
@@ -52,7 +55,7 @@ class CartService {
 
   addOrUpdate(payload: AddOrUpdateItem): Observable<CartUpdatedResponse> {
     const header = new HttpHeaders({
-      'ContentType': 'application/json',
+      'Content-Type': 'application/json',
       'Authorization': `Bearer ${this.authProvider.getAccessToken()}`
     });
     return this.httpClient.post<CartUpdatedResponse>(`${this._rootUrl}/baskets/update`, JSON.stringify(payload), {headers: header});
@@ -68,5 +71,8 @@ class CartService {
 }
 
 export {
-  CartService
+  CartService,
+  CartItem,
+  Cart,
+  CartUpdatedInfo
 }

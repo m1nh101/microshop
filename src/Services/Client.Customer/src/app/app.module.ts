@@ -16,6 +16,7 @@ import { NzGridModule } from 'ng-zorro-antd/grid'
 import { NzInputModule } from 'ng-zorro-antd/input';
 import { NzCardModule } from 'ng-zorro-antd/card';
 import { NzFlexModule } from 'ng-zorro-antd/flex';
+import { NzDividerModule } from 'ng-zorro-antd/divider';
 import { NZ_I18N, en_US } from 'ng-zorro-antd/i18n';
 import { registerLocaleData } from '@angular/common';
 import en from '@angular/common/locales/en';
@@ -50,7 +51,8 @@ registerLocaleData(en);
     NzGridModule,
     NzInputModule,
     NzCardModule,
-    NzFlexModule
+    NzFlexModule,
+    NzDividerModule
   ],
   providers: [
     { provide: NZ_I18N, useValue: en_US },

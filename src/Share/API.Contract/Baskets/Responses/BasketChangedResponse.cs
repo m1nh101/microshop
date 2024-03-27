@@ -3,5 +3,7 @@
 public sealed record BasketChangedResponse
 {
   public required string ProductId { get; init; }
-  public required double TotalItemPrice { get; init; }
+  public required int NewQuantity { get; init; }
+  public required double NewTotalItemPrice { get; init; }
+  public required double NewTotalBasketPrice { get; init; }
 }
