@@ -14,6 +14,8 @@ import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzSpaceModule } from 'ng-zorro-antd/space';
 import { NzGridModule } from 'ng-zorro-antd/grid'
 import { NzInputModule } from 'ng-zorro-antd/input';
+import { NzCardModule } from 'ng-zorro-antd/card';
+import { NzFlexModule } from 'ng-zorro-antd/flex';
 import { NZ_I18N, en_US } from 'ng-zorro-antd/i18n';
 import { registerLocaleData } from '@angular/common';
 import en from '@angular/common/locales/en';
@@ -23,6 +25,7 @@ import { provideHttpClient } from '@angular/common/http'
 import { NzFormModule } from 'ng-zorro-antd/form';
 import { ReactiveFormsModule } from '@angular/forms'
 import { HttpClientModule } from '@angular/common/http';
+import { CartComponent } from './pages/cart/cart.component';
 
 registerLocaleData(en);
 
@@ -32,6 +35,7 @@ registerLocaleData(en);
     LoginComponent,
     RegisterComponent,
     HomeComponent,
+    CartComponent,
   ],
   imports: [
     BrowserModule,
@@ -44,7 +48,9 @@ registerLocaleData(en);
     NzFormModule,
     ReactiveFormsModule,
     NzGridModule,
-    NzInputModule
+    NzInputModule,
+    NzCardModule,
+    NzFlexModule
   ],
   providers: [
     { provide: NZ_I18N, useValue: en_US },

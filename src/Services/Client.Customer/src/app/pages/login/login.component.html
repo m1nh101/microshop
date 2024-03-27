@@ -1,5 +1,6 @@
 <div nz-row>
   <form nz-col nzSpan="6" nz-form [formGroup]="formValidation" nzLayout="vertical">
+    <p style="text-align: center; color: red;" *ngIf="loginFailed">Sai tên đăng nhập/mật khẩu</p>
     <nz-form-item>
       <nz-form-label [nzSpan]="6" [nzFor]="username" nzRequired="">Tên đăng nhập</nz-form-label>
       <nz-form-control nzErrorTip="Vui lòng nhập tên đăng nhập/email">

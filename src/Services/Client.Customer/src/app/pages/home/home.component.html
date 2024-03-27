@@ -1,1 +1,14 @@
-<p>home works!</p>
+<div nz-flex nzGap="middle" nzWrap="wrap">
+  <div style="width: 20%;" *ngFor="let product of products">
+    <nz-card  [nzCover]="coverTemplate" [nzActions]="[addToCart]">
+      <nz-card-meta style="text-align: center;" nzTitle="{{product.name}}" nzDescription="{{product.description}}"></nz-card-meta>
+      <nz-card-meta style="text-align: center; margin-top: 5px; color: red;" nzTitle="{{product.price | currency: 'VND'}}" nzDescription="{{product.description}}"></nz-card-meta>
+    </nz-card>
+    <ng-template #coverTemplate>
+      <img alt="{{product.name}}" src="https://cdn0199.cdn4s.com/media/ap246%20%C4%91en%201.jpg" />
+    </ng-template>
+    <ng-template #addToCart>
+      <button nz-button nzType="primary" (click)="onAddToCartClick(product.id)">Thêm vào giỏ</button>
+    </ng-template>
+  </div>
+<div>

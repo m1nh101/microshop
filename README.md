@@ -9,5 +9,8 @@
 - Add not found page
 - Add backend error page
 
+## Client(Angular)
+-	
+
 ## Backend
 - Add logging

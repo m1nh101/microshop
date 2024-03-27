@@ -1,6 +1,8 @@
 import { Component } from '@angular/core';
 import { FormControl, FormGroup, NonNullableFormBuilder, Validators } from '@angular/forms';
 import { UserCredential, UserService } from '../../services/userService';
+import { AuthStateProvider } from '../../authStateProvider';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-login',
@@ -10,6 +12,7 @@ import { UserCredential, UserService } from '../../services/userService';
 export class LoginComponent {
   username: string = "";
   password: string = "";
+  loginFailed: boolean = false;
 
   formValidation: FormGroup<{
     username: FormControl<string>;
@@ -18,7 +21,9 @@ export class LoginComponent {
 
   constructor(
     private formBuilder: NonNullableFormBuilder,
-    private userService: UserService) {
+    private userService: UserService,
+    private authProvider: AuthStateProvider,
+    private router: Router) {
     this.formValidation = this.formBuilder.group({
       username: ['', [Validators.required]],
       password: ['', [Validators.required]]
@@ -33,9 +38,13 @@ export class LoginComponent {
       this.userService.Authenticate(this.formValidation.value as UserCredential)
         .subscribe(res => {
           if(res.isSuccess) {
-            localStorage.setItem('access_token', res.data.accessToken); // will be store by http cookie
-            localStorage.setItem('refresh_token', res.data.refreshToken);
+            this.authProvider.setAccessToken(res.data.accessToken); 
+            localStorage.setItem('refresh_token', res.data.refreshToken); // will be store by http cookie
+            this.router.navigate(['/'])
+            return;
           }
+
+          this.loginFailed = true;
         })
 
       return;
