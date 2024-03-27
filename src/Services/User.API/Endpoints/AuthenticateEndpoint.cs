@@ -82,7 +82,8 @@ public sealed class AuthenticateEndpoint : Endpoint<AuthenticateRequest, Result<
     var userToken = new UserToken()
     {
       UserId = user.Id,
-      RefreshToken = refreshToken
+      RefreshToken = refreshToken,
+      UserAgent = HttpContext.Request.Headers.UserAgent.ToString()
     };
 
     // store access token to cache system

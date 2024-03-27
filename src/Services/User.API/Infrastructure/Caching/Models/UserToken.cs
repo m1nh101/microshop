@@ -9,5 +9,7 @@ public sealed class UserToken
   public required string UserId { get; init; }
   [Searchable]
   public required string RefreshToken { get; init; }
+  [Searchable]
+  public required string UserAgent { get; init; }
   public DateTime CreatedAt { get; private set; } = DateTime.UtcNow;
 }

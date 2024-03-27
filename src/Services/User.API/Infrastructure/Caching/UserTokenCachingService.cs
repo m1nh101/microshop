@@ -14,9 +14,9 @@ public sealed class UserTokenCachingService
   }
 
   public async Task AddUserToken(UserToken token) => await _tokens.InsertAsync(token, TimeSpan.FromDays(7));
-  public async Task<UserToken?> GetTokenByRefreshToken(string refreshToken)
+  public async Task<UserToken?> GetTokenByRefreshToken(string refreshToken, string userAgent)
   {
-    return await _tokens.FirstOrDefaultAsync(e => e.RefreshToken == refreshToken);
+    return await _tokens.FirstOrDefaultAsync(e => e.RefreshToken == refreshToken && e.UserAgent == userAgent);
   }
 
   public async Task RevokeRefreshToken(string userId)

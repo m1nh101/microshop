@@ -30,8 +30,9 @@ public sealed class RequireAccessTokenEndpoint : Endpoint<RequireAccessTokenRequ
 
   public override async Task HandleAsync(RequireAccessTokenRequest req, CancellationToken ct)
   {
+    var userAgent = HttpContext.Request.Headers.UserAgent.ToString();
     // check token validation
-    var token = await _cache.GetTokenByRefreshToken(req.RefreshToken);
+    var token = await _cache.GetTokenByRefreshToken(req.RefreshToken, userAgent);
     if (token == null)
     {
       await SendAsync(
