@@ -1,9 +1,9 @@
 using Auth;
-using FastEndpoints;
-using FastEndpoints.Swagger;
+using Common.Mediator;
 using Microsoft.EntityFrameworkCore;
 using Redis.OM;
 using Redis.OM.Contracts;
+using User.API;
 using User.API.Application.Contracts;
 using User.API.Application.Helpers;
 using User.API.Backgrounds;
@@ -43,26 +43,14 @@ builder.Services.AddHostedService<DatabaseMigrateService>();
 builder.Services.AddHostedService<RedisIndexService>();
 
 builder.Services.AddJwt(builder.Configuration);
-builder.Services.AddFastEndpoints().SwaggerDocument();
-
-// Add services to the container.
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddMediator(typeof(Program).Assembly);
 
 var app = builder.Build();
-
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-  app.UseSwagger();
-  app.UseSwaggerUI();
-}
 
 app.UseHttpsRedirection();
 
 app.UseAuth();
 
-app.UseFastEndpoints();
+app.UseUserAPIEndpoint();
 
 app.Run();

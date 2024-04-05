@@ -1,24 +1,23 @@
 ﻿using API.Contract.Products.Responses;
 using Common;
-using FastEndpoints;
-using Microsoft.AspNetCore.Authorization;
+using Common.Mediator;
 using Microsoft.EntityFrameworkCore;
 using Product.API.Infrastructure.Database;
 
-namespace Product.API.Endpoints;
+namespace Product.API.Handlers;
 
-[HttpGet("/api/products/list-option")]
-[AllowAnonymous]
-public class GetOptionListEndpoint : Endpoint<EmptyRequest, Result<FilterOptionResponse>>
+public sealed record GetOptionRequest;
+
+public class GetOptionHandler : IRequestHandler<GetOptionRequest>
 {
   private readonly ProductDbContext _context;
 
-  public GetOptionListEndpoint(ProductDbContext context)
+  public GetOptionHandler(ProductDbContext context)
   {
     _context = context;
   }
 
-  public override async Task HandleAsync(EmptyRequest req, CancellationToken ct)
+  public async Task<object> Handle(GetOptionRequest request)
   {
     var brandOptions = await _context.Brands
       .AsNoTracking()
@@ -27,7 +26,7 @@ public class GetOptionListEndpoint : Endpoint<EmptyRequest, Result<FilterOptionR
         Label = e.Name,
         Value = e.Id
       })
-      .ToListAsync(ct);
+      .ToListAsync();
     var typeOptions = await _context.Types
       .AsNoTracking()
       .Select(e => new SelectOption
@@ -35,12 +34,9 @@ public class GetOptionListEndpoint : Endpoint<EmptyRequest, Result<FilterOptionR
         Label = e.Name,
         Value = e.Id
       })
-      .ToListAsync(ct);
+      .ToListAsync();
     var data = new FilterOptionResponse(brandOptions, typeOptions);
 
-    await SendAsync(
-      response: Result<FilterOptionResponse>.Ok(data),
-      statusCode: 200,
-      cancellation: ct);
+    return Result<FilterOptionResponse>.Ok(data);
   }
 }
