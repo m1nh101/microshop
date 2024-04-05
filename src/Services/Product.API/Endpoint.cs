@@ -2,7 +2,6 @@
 using API.Contract.Products.Responses;
 using Common;
 using Common.Mediator;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Product.API.Handlers;
 
@@ -33,58 +32,63 @@ public static class Endpoint
     return builder;
   }
 
-  private static async Task<Ok<Result<ProductDetailResponse>>> CreateProductEndpoint(
+  private static async Task<IResult> CreateProductEndpoint(
     [FromServices] IMediator mediator,
     [FromBody] CreateProductRequest request)
   {
     var result = await mediator.Send(request).As<Result<ProductDetailResponse>>();
 
-    return TypedResults.Ok(result);
+    return GenerateHttpResponse(result);
   }
 
-  private static async Task<Ok<Result<ProductDetailResponse>>> EditProductEndpoint(
+  private static async Task<IResult> EditProductEndpoint(
     [FromServices] IMediator mediator,
     [FromBody] EditProductRequest request,
     [FromRoute] string id)
   {
     var result = await mediator.Send(request).As<Result<ProductDetailResponse>>();
 
-    return TypedResults.Ok(result);
+    return GenerateHttpResponse(result);
   }
 
-  private static async Task<Ok<Result<RemoveProductResponse>>> RemoveProductEndpoint(
+  private static async Task<IResult> RemoveProductEndpoint(
     [FromServices] IMediator mediator,
     [FromRoute] string id)
   {
     var command = new RemoveProductRequest() { Id = id };
     var result = await mediator.Send(command).As<Result<RemoveProductResponse>>();
 
-    return TypedResults.Ok(result);
+    return GenerateHttpResponse(result);
   }
 
-  private static async Task<Ok<Result<FilterOptionResponse>>> GetOptionEndpoint(
+  private static async Task<IResult> GetOptionEndpoint(
     [FromServices] IMediator mediator)
   {
     var query = new GetOptionRequest();
     var result = await mediator.Send(query).As<Result<FilterOptionResponse>>();
 
-    return TypedResults.Ok(result);
+    return GenerateHttpResponse(result);
   }
 
-  private static async Task<Ok<Result<ProductDetailResponse>>> GetProductDetailEndpoint(
+  private static async Task<IResult> GetProductDetailEndpoint(
     [FromServices] IMediator mediator,
     [FromRoute] string id)
   {
     var query = new GetProductByIdRequest { Id = id };
     var result = await mediator.Send(query).As<Result<ProductDetailResponse>>();
-    return TypedResults.Ok(result);
+    return GenerateHttpResponse(result);
   }
 
-  private static async Task<Ok<Result<IEnumerable<ProductPaginationResponse>>>> GetProductPaginationEndpoint(
+  private static async Task<IResult> GetProductPaginationEndpoint(
     [FromServices] IMediator mediator,
     [FromQuery] GetProductPaginationRequest request)
   {
     var result = await mediator.Send(request).As<Result<IEnumerable<ProductPaginationResponse>>>();
-    return TypedResults.Ok(result);
+    return GenerateHttpResponse(result);
+  }
+
+  private static IResult GenerateHttpResponse(Result<object> result)
+  {
+    return result.IsSuccess ? TypedResults.Ok(result.Data) : TypedResults.BadRequest(result.Errors);
   }
 }

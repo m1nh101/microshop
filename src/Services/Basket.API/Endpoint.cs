@@ -4,7 +4,6 @@ using Basket.API.Handlers;
 using Basket.API.Models;
 using Common;
 using Common.Mediator;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Basket.API;
@@ -20,30 +19,35 @@ public static class Endpoint
     return builder;
   }
 
-  private static async Task<Ok<Result<CustomerBasket>>> GetBasketEndpoint(
+  private static async Task<IResult> GetBasketEndpoint(
     [FromServices] IMediator mediator)
   {
     var query = new GetBasketRequest();
     var result = await mediator.Send(query).As<Result<CustomerBasket>>();
 
-    return TypedResults.Ok(result);
+    return GenerateHttpResponse(result);
   }
 
-  private static async Task<Ok<Result<BasketChangedResponse>>> AddOrUpdateBasketItemEndpoint(
+  private static async Task<IResult> AddOrUpdateBasketItemEndpoint(
     [FromServices] IMediator mediator,
     [FromBody] AddOrUpdateBasketItemRequest request)
   {
     var result = await mediator.Send(request).As<Result<BasketChangedResponse>>();
-    return TypedResults.Ok(result);
+    return GenerateHttpResponse(result);
   }
 
-  private static async Task<Ok<Result<BasketChangedResponse>>> RemoveBasketItemEndpoint(
+  private static async Task<IResult> RemoveBasketItemEndpoint(
     [FromServices] IMediator mediator,
     [FromRoute] string id)
   {
     var command = new RemoveBasketItemRequest(id);
     var result = await mediator.Send(command).As<Result<BasketChangedResponse>>();
 
-    return TypedResults.Ok(result);
+    return GenerateHttpResponse(result);
+  }
+
+  private static IResult GenerateHttpResponse(Result<object> result)
+  {
+    return result.IsSuccess ? TypedResults.Ok(result.Data) : TypedResults.BadRequest(result.Errors);
   }
 }

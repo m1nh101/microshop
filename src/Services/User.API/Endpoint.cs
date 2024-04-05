@@ -2,7 +2,6 @@
 using API.Contract.Users.Responses;
 using Common;
 using Common.Mediator;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using User.API.Application.Handlers;
 
@@ -21,19 +20,19 @@ public static class Endpoint
     return builder;
   }
 
-  private static async Task<Ok<Result<AuthenticateResponse>>> AuthenticateEndpoint(
+  private static async Task<IResult> AuthenticateEndpoint(
     [FromServices] IMediator mediator,
     HttpContext httpContext,
     [FromBody] AuthenticateRequest request)
   {
     var userAgent = httpContext.Request.Headers.UserAgent;
     var command = new AuthenticateCommand(request.Username, request.Password, userAgent!);
-    var response = await mediator.Send(command)
+    var result = await mediator.Send(command)
       .As<Result<AuthenticateResponse>>();
 
-    if(response.IsSuccess)
+    if(result.IsSuccess)
     {
-      httpContext.Response.Cookies.Append("access_token", response.Data!.AccessToken, new CookieOptions
+      httpContext.Response.Cookies.Append("access_token", result.Data!.AccessToken, new CookieOptions
       {
         Secure = true,
         HttpOnly = true,
@@ -41,29 +40,31 @@ public static class Endpoint
         Path = "/"
       });
 
-      httpContext.Response.Cookies.Append("refresh_token", response.Data!.RefreshToken, new CookieOptions
+      httpContext.Response.Cookies.Append("refresh_token", result.Data!.RefreshToken, new CookieOptions
       {
         Secure = true,
         HttpOnly = true,
         SameSite = SameSiteMode.None,
         Path = "/token"
       });
+
+      return TypedResults.Ok(result.Data);
     }
 
-    return TypedResults.Ok(response);
+    return TypedResults.BadRequest(result.Errors);
   }
 
-  private static async Task<Ok<Result<RegisterResponse>>> RegisterEndpoint(
+  private static async Task<IResult> RegisterEndpoint(
     [FromServices] IMediator mediator,
     [FromBody] RegisterRequest request)
   {
     var result = await mediator.Send(request)
       .As<Result<RegisterResponse>>();
 
-    return TypedResults.Ok(result);
+    return GenerateHttpResponse(result);
   }
 
-  private static async Task<Ok<Result<RequireAccessTokenResponse>>> RequireAccessTokenEndpoint(
+  private static async Task<IResult> RequireAccessTokenEndpoint(
     [FromServices] IMediator mediator,
     HttpContext httpContext)
   {
@@ -71,13 +72,13 @@ public static class Endpoint
     var refreshToken = httpContext.Request.Cookies["refresh_token"]?.ToString()
       ?? httpContext.Request.Query["refreshToken"].ToString();
     var request = new RequireAccessTokenCommand(refreshToken, userAgent!);
-    var response = await mediator.Send(request)
+    var result = await mediator.Send(request)
       .As<Result<RequireAccessTokenResponse>>();
 
-    return TypedResults.Ok(response);
+    return GenerateHttpResponse(result);
   }
 
-  private static async Task<NoContent> SignoutEndpoint(
+  private static async Task<IResult> SignoutEndpoint(
     [FromServices] IMediator mediator,
     HttpContext httpContext)
   {
@@ -88,5 +89,10 @@ public static class Endpoint
     httpContext.Response.Cookies.Delete("access_token");
 
     return TypedResults.NoContent();
+  }
+
+  private static IResult GenerateHttpResponse(Result<object> result)
+  {
+    return result.IsSuccess ? TypedResults.Ok(result.Data) : TypedResults.BadRequest(result.Errors);
   }
 }
