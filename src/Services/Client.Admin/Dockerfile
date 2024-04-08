@@ -11,7 +11,6 @@ ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 COPY ["src/Services/Client.Admin/Client.Admin.csproj", "src/Services/Client.Admin/"]
 COPY ["src/Share/API.Contract/API.Contract.csproj", "src/Share/API.Contract/"]
-COPY ["src/Share/Auth/Auth.csproj", "src/Share/Auth/"]
 COPY ["src/Share/Common/Common.csproj", "src/Share/Common/"]
 RUN dotnet restore "./src/Services/Client.Admin/./Client.Admin.csproj"
 COPY . .

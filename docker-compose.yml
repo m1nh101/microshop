@@ -12,6 +12,7 @@ x-config: &config
     - ASPNETCORE_URLS=https://+:443
     - ASPNETCORE_Kestrel__Certificates__Default__Password=M1ng@2002
     - ASPNETCORE_Kestrel__Certificates__Default__Path=/https/aspnetapp.pfx
+    - MQ_HOST=rabbitmq
   volumes:
     - ~/.aspnet/https:/https:ro
 
@@ -43,6 +44,7 @@ services:
     #   - 7204:443
     depends_on:
       - redis
+      - rabbitmq
 
   user-api:
     image: user-api
@@ -57,6 +59,7 @@ services:
     depends_on:
       - redis
       - db
+      - rabbitmq
 
   product-api:
     image: product-api
@@ -70,6 +73,7 @@ services:
     #   - 7295:443
     depends_on:
       - db
+      - rabbitmq
  
   admin-client:
     image: admin-client
@@ -119,4 +123,14 @@ services:
       - shop_net
     expose:
       - 1433
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    ports:
+      - 5672:5672
+      - 15672:15672
+    volumes:
+      - ~/.docker-conf/rabbitmq/data/:/var/lib/rabbitmq/
+      - ~/.docker-conf/rabbitmq/log/:/var/log/rabbitmq
+    networks:
+      - shop_net
    

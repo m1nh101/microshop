@@ -3,6 +3,7 @@ using Basket.API.HostedServices;
 using Basket.API.Repositories;
 using Basket.API.RPC.Clients;
 using Common.Auth;
+using Common.EventBus;
 using Common.Mediator;
 using Grpc.Net.Client;
 using Redis.OM;
@@ -32,7 +33,7 @@ builder.Services.AddSingleton(sp =>
   {
     HttpHandler = handler
   };
-  var channel = GrpcChannel.ForAddress("https://product-api:443", option);
+  var channel = GrpcChannel.ForAddress("https://product-api:443", option); //use env
   var grpcClient = new ProductRpc.ProductRpcClient(channel);
 
   return new ProductRpcClient(grpcClient);
@@ -45,6 +46,7 @@ builder.Services.AddScoped<IBasketRepository, BasketRepository>();
 builder.Services.AddHostedService<RedisIndexHostedService>();
 
 builder.Services.AddMediator(typeof(Program).Assembly);
+builder.Services.AddEventBus(typeof(Program).Assembly, builder.Configuration);
 
 var app = builder.Build();
 

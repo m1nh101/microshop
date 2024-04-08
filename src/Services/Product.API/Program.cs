@@ -1,4 +1,5 @@
 using Common.Auth;
+using Common.EventBus;
 using Common.Mediator;
 using Microsoft.EntityFrameworkCore;
 using Product.API;
@@ -26,6 +27,7 @@ builder.Services.AddHostedService<DatabaseHostedService>();
 builder.Services.AddGrpc();
 
 builder.Services.AddMediator(typeof(Program).Assembly);
+builder.Services.AddEventBus(typeof(Program).Assembly, builder.Configuration);
 
 var app = builder.Build();
 

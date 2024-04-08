@@ -1,4 +1,7 @@
 using Common.Auth;
+using Common.EventBus;
+using Common.Mediator;
+using Grpc.Net.Client;
 using Microsoft.EntityFrameworkCore;
 using Order.API;
 using Order.API.Applications.Contracts;
@@ -9,7 +12,6 @@ using Order.API.RPC.Clients;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 
 builder.Services.AddDbContext<OrderDbContext>(opt =>
 {
@@ -20,12 +22,29 @@ builder.Services.AddDbContext<OrderDbContext>(opt =>
   opt.UseSqlServer(connectionString);
 });
 
+builder.Services.AddSingleton<IBasketClient>(sp =>
+{
+  var handler = new HttpClientHandler
+  {
+    ServerCertificateCustomValidationCallback =
+      HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
+  };
+  var option = new GrpcChannelOptions
+  {
+    HttpHandler = handler
+  };
+  var channel = GrpcChannel.ForAddress("https://basket-api:443", option); // use env 
+  var grpcClient = new BasketRgpc.BasketRgpcClient(channel);
+
+  return new BasketRpcClient(grpcClient);
+});
+
 builder.Services.AddSingleton<DatabaseMigrator>();
 builder.Services.AddHostedService<DatabaseMigrateService>();
 
-builder.Services.AddScoped<IBasketClient, BasketRpcClient>();
-
 builder.Services.AddJwt(builder.Configuration);
+builder.Services.AddMediator(typeof(Program).Assembly);
+builder.Services.AddEventBus(typeof(Program).Assembly, builder.Configuration);
 
 var app = builder.Build();
 

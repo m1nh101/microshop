@@ -24,6 +24,6 @@ public class RevokeTokenHandler : IRequestHandler<RevokeTokenCommand>
   {
     await _cache.RevokeRefreshToken(_session.UserId);
 
-    return Error.None;
+    return Result<EmptyResult>.Ok(new EmptyResult());
   }
 }

@@ -1,6 +1,6 @@
 ﻿using API.Contract.Baskets.Requests;
 using API.Contract.Baskets.Responses;
-using Basket.API.Handlers;
+using Basket.API.Applications.Handlers;
 using Basket.API.Models;
 using Common;
 using Common.Mediator;

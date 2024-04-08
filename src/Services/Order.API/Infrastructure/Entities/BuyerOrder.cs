@@ -12,6 +12,7 @@ public class BuyerOrder
     UserId = buyerId;
     CreatedAt = DateTime.Now;
     ShippingAddress = shippingAddress;
+    BuyerName = buyerName;
   }
 
   public string Id { get; private set; } = string.Empty;

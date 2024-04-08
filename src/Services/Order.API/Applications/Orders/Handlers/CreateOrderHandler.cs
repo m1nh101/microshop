@@ -1,10 +1,12 @@
 ﻿using Common;
 using Common.Auth;
+using Common.EventBus;
 using Common.Mediator;
+using Order.API.Applications.Contracts;
+using Order.API.Applications.Events;
 using Order.API.Applications.Orders.Responses;
 using Order.API.Infrastructure;
 using Order.API.Infrastructure.Entities;
-using Order.API.RPC.Clients;
 
 namespace Order.API.Applications.Orders.Handlers;
 
@@ -14,17 +16,20 @@ public record CreateOrderRequest(
 public class CreateOrderHandler : IRequestHandler<CreateOrderRequest>
 {
   private readonly IUserSessionContext _session;
+  private readonly IEventBus _eventBus;
   private readonly OrderDbContext _context;
-  private readonly BasketRpcClient _basketClient;
+  private readonly IBasketClient _basketClient;
 
   public CreateOrderHandler(
     IUserSessionContext session,
     OrderDbContext context,
-    BasketRpcClient basketClient)
+    IBasketClient basketClient,
+    IEventBus eventBus)
   {
     _session = session;
     _context = context;
     _basketClient = basketClient;
+    _eventBus = eventBus;
   }
 
   public async Task<object> Handle(CreateOrderRequest request)
@@ -38,6 +43,11 @@ public class CreateOrderHandler : IRequestHandler<CreateOrderRequest>
 
     await _context.Orders.AddAsync(order);
     await _context.SaveChangesAsync();
+
+    await _eventBus.Publish(new OrderCreatedEvent(
+      order.Id,
+      order.UserId,
+      order.Items));
 
     return Result<CustomerOrderResponse>.Ok(new CustomerOrderResponse(
       order.Id,

@@ -10,6 +10,7 @@ FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 COPY ["src/Services/Order.API/Order.API.csproj", "src/Services/Order.API/"]
+COPY ["src/Share/Common/Common.csproj", "src/Share/Common/"]
 RUN dotnet restore "./src/Services/Order.API/./Order.API.csproj"
 COPY . .
 WORKDIR "/src/src/Services/Order.API"

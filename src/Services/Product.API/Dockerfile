@@ -10,7 +10,6 @@ FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 COPY ["src/Services/Product.API/Product.API.csproj", "src/Services/Product.API/"]
-COPY ["src/Share/Auth/Auth.csproj", "src/Share/Auth/"]
 COPY ["src/Share/Common/Common.csproj", "src/Share/Common/"]
 RUN dotnet restore "./src/Services/Product.API/./Product.API.csproj"
 COPY . .

@@ -5,7 +5,7 @@ using Common.Mediator;
 using Microsoft.EntityFrameworkCore;
 using Product.API.Infrastructure.Database;
 
-namespace Product.API.Handlers;
+namespace Product.API.Applications.Handlers;
 
 public class GetProductDetailHandler : IRequestHandler<GetProductByIdRequest>
 {

@@ -9,3 +9,16 @@ public record IntergratedEvent
 
   public DateTime CreatedAt { get; }
 }
+
+public interface IEventHandler
+{
+  Task Handle(IntergratedEvent @event);
+}
+
+public interface IEventHandler<in TEvent>
+  : IEventHandler
+  where TEvent : IntergratedEvent
+{
+  Task Handle(TEvent @event);
+  Task IEventHandler.Handle(IntergratedEvent @event) => Handle((TEvent)@event);
+}

@@ -4,7 +4,7 @@ using Common;
 using Common.Auth;
 using Common.Mediator;
 
-namespace Basket.API.Handlers;
+namespace Basket.API.Applications.Handlers;
 
 public sealed record GetBasketRequest;
 

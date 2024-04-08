@@ -61,6 +61,6 @@ public class RegisterHandler : IRequestHandler<RegisterRequest>
     await _context.Users.AddAsync(user);
     await _context.SaveChangesAsync();
 
-    return new RegisterResponse();
+    return Result<RegisterResponse>.Ok(new RegisterResponse());
   }
 }

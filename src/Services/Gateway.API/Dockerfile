@@ -11,6 +11,7 @@ ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 COPY ["src/Services/Gateway.API/Gateway.API.csproj", "src/Services/Gateway.API/"]
 COPY ["src/Services/Gateway.API/config.yml", "src/Services/Gateway.API/"]
+COPY ["src/Share/Common/Common.csproj", "src/Share/Common/"]
 RUN dotnet restore "./src/Services/Gateway.API/./Gateway.API.csproj"
 COPY . .
 WORKDIR "/src/src/Services/Gateway.API"

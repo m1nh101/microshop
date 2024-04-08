@@ -3,7 +3,7 @@ using API.Contract.Products.Responses;
 using Common;
 using Common.Mediator;
 using Microsoft.AspNetCore.Mvc;
-using Product.API.Handlers;
+using Product.API.Applications.Handlers;
 
 namespace Product.API;
 

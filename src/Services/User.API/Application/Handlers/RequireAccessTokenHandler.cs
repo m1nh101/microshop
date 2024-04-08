@@ -1,5 +1,6 @@
 ﻿using API.Contract.Users.Requests;
 using API.Contract.Users.Responses;
+using Common;
 using Common.Mediator;
 using Microsoft.EntityFrameworkCore;
 using User.API.Application.Contracts;
@@ -47,6 +48,6 @@ public class RequireAccessTokenHandler : IRequestHandler<RequireAccessTokenComma
 
     var accessToken = _accessTokenGenerator.Generate(user, roles);
 
-    return new RequireAccessTokenResponse(accessToken);
+    return Result<RequireAccessTokenResponse>.Ok(new RequireAccessTokenResponse(accessToken));
   }
 }
