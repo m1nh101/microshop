@@ -12,6 +12,14 @@ using Redis.OM.Contracts;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddSingleton(sp =>
+{
+  return new RunningAssembly
+  {
+    Assembly = typeof(Program).Assembly,
+  };
+});
+
 builder.Services.AddSingleton<IRedisConnectionProvider>(sp =>
 {
   var configuration = new RedisConnectionConfiguration

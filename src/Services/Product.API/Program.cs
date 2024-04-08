@@ -9,6 +9,14 @@ using Product.API.RPC.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddSingleton(sp =>
+{
+  return new RunningAssembly
+  {
+    Assembly = typeof(Program).Assembly,
+  };
+});
+
 builder.Services.AddJwt(builder.Configuration);
 
 builder.Services.AddDbContext<ProductDbContext>(opt =>

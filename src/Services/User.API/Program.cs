@@ -1,4 +1,5 @@
 using Common.Auth;
+using Common.EventBus;
 using Common.Mediator;
 using Microsoft.EntityFrameworkCore;
 using Redis.OM;
@@ -11,6 +12,14 @@ using User.API.Infrastructure.Caching;
 using User.API.Infrastructure.Database;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddSingleton(sp =>
+{
+  return new RunningAssembly
+  {
+    Assembly = typeof(Program).Assembly,
+  };
+});
 
 builder.Services.AddDbContext<UserDbContext>(opt =>
 {

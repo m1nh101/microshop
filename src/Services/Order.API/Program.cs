@@ -13,6 +13,14 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
+builder.Services.AddSingleton(sp =>
+{
+  return new RunningAssembly
+  {
+    Assembly = typeof(Program).Assembly,
+  };
+});
+
 builder.Services.AddDbContext<OrderDbContext>(opt =>
 {
   var server = builder.Configuration["DB_SERVER"] ?? "127.0.0.1";

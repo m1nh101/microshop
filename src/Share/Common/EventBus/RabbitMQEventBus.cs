@@ -3,7 +3,6 @@ using Microsoft.Extensions.Hosting;
 using Newtonsoft.Json;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
-using System.Reflection;
 using System.Text;
 
 namespace Common.EventBus;
@@ -11,13 +10,17 @@ namespace Common.EventBus;
 public class RabbitMQEventBus : IHostedService, IEventBus
 {
   private readonly ConnectionFactory _connectionFactory;
+  private readonly RunningAssembly _runningAssembly;
   private readonly IServiceProvider _serviceProvider;
 
-  public RabbitMQEventBus(ConnectionFactory connectionFactory,
-    IServiceProvider serviceProvider)
+  public RabbitMQEventBus(
+    ConnectionFactory connectionFactory,
+    IServiceProvider serviceProvider,
+    RunningAssembly runningAssembly)
   {
     _connectionFactory = connectionFactory;
     _serviceProvider = serviceProvider;
+    _runningAssembly = runningAssembly;
   }
 
   public Task Publish<TMessage>(TMessage message)
@@ -41,8 +44,8 @@ public class RabbitMQEventBus : IHostedService, IEventBus
   public Task StartAsync(CancellationToken cancellationToken)
   {
     // 
-    var root = typeof(IConsumer<>);
-    var implements = Assembly.GetExecutingAssembly()
+    var root = typeof(IEventHandler<>);
+    var implements = _runningAssembly.Assembly
       .GetTypes()
       .Where(e => e.GetInterfaces().Any(d => d.IsGenericType && d.GetGenericTypeDefinition() == root));
 
