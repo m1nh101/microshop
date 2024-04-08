@@ -1,6 +1,6 @@
 ﻿using Order.API.Infrastructure.Entities;
 
-namespace Order.API.Http.Responses;
+namespace Order.API.Applications.Orders.Responses;
 
 public record OrderResponse(
   string Id,

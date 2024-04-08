@@ -1,6 +1,4 @@
-﻿using Grpc.Net.Client;
-
-namespace Basket.API.RPC.Clients;
+﻿namespace Basket.API.RPC.Clients;
 
 public class ProductRpcClient
 {

@@ -1,7 +1,7 @@
-using Auth;
 using Client.Admin;
 using Client.Admin.Components;
 using Client.Admin.Services;
+using Common.Auth;
 
 var builder = WebApplication.CreateBuilder(args);
 

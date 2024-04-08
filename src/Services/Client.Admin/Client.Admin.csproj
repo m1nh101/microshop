@@ -21,7 +21,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\Share\API.Contract\API.Contract.csproj" />
-    <ProjectReference Include="..\..\Share\Auth\Auth.csproj" />
     <ProjectReference Include="..\..\Share\Common\Common.csproj" />
   </ItemGroup>
 

@@ -1,4 +1,4 @@
-using Auth;
+using Common.Auth;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Configuration.AddYamlFile("config.yml", false, true);

@@ -5,7 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 
-namespace Auth;
+namespace Common.Auth;
 
 public static class AuthConfiguration
 {

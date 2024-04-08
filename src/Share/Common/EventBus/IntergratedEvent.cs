@@ -1,4 +1,4 @@
-﻿namespace Common;
+﻿namespace Common.EventBus;
 
 public record IntergratedEvent
 {

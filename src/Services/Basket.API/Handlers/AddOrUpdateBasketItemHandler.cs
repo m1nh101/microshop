@@ -1,11 +1,11 @@
 ﻿using API.Contract.Baskets.Requests;
-using Auth;
+using API.Contract.Baskets.Responses;
 using Basket.API.Models;
 using Basket.API.Repositories;
 using Basket.API.RPC.Clients;
-using Common.Mediator;
 using Common;
-using API.Contract.Baskets.Responses;
+using Common.Auth;
+using Common.Mediator;
 
 namespace Basket.API.Handlers;
 

@@ -1,8 +1,9 @@
-﻿using Order.API.Models;
+﻿using Order.API.Applications.Contracts;
+using Order.API.Models;
 
 namespace Order.API.RPC.Clients;
 
-public class BasketRpcClient
+public class BasketRpcClient : IBasketClient
 {
   private readonly BasketRgpc.BasketRgpcClient _client;
 

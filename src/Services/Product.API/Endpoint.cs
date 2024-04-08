@@ -81,9 +81,19 @@ public static class Endpoint
 
   private static async Task<IResult> GetProductPaginationEndpoint(
     [FromServices] IMediator mediator,
-    [FromQuery] GetProductPaginationRequest request)
+    [FromQuery] string[]? brands,
+    [FromQuery] string? typeId,
+    [FromQuery] string? name,
+    [FromQuery] int pageIndex = 0)
   {
-    var result = await mediator.Send(request).As<Result<IEnumerable<ProductPaginationResponse>>>();
+    var query = new GetProductPaginationRequest()
+    {
+      PageIndex = pageIndex,
+      Brands = brands,
+      Name = name,
+      TypeId = typeId,
+    };
+    var result = await mediator.Send(query).As<Result<IEnumerable<ProductPaginationResponse>>>();
     return GenerateHttpResponse(result);
   }
 

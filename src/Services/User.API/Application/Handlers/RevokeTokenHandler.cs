@@ -1,5 +1,5 @@
-﻿using Auth;
-using Common;
+﻿using Common;
+using Common.Auth;
 using Common.Mediator;
 using User.API.Infrastructure.Caching;
 

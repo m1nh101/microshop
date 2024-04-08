@@ -1,7 +1,7 @@
-﻿using Auth;
-using Basket.API.Models;
+﻿using Basket.API.Models;
 using Basket.API.Repositories;
 using Common;
+using Common.Auth;
 using Common.Mediator;
 
 namespace Basket.API.Handlers;

@@ -1,4 +1,4 @@
-using Auth;
+using Common.Auth;
 using Common.Mediator;
 using Microsoft.EntityFrameworkCore;
 using Redis.OM;

@@ -30,7 +30,7 @@ public static class Endpoint
     var result = await mediator.Send(command)
       .As<Result<AuthenticateResponse>>();
 
-    if(result.IsSuccess)
+    if (result.IsSuccess)
     {
       httpContext.Response.Cookies.Append("access_token", result.Data!.AccessToken, new CookieOptions
       {

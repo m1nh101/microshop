@@ -1,4 +1,4 @@
-﻿namespace Auth;
+﻿namespace Common.Auth;
 
 public sealed record TokenOption
 {

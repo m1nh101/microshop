@@ -1,8 +1,8 @@
 ﻿using API.Contract.Baskets.Requests;
 using API.Contract.Baskets.Responses;
-using Auth;
 using Basket.API.Repositories;
 using Common;
+using Common.Auth;
 using Common.Mediator;
 
 namespace Basket.API.Handlers;
@@ -27,7 +27,7 @@ public class RemoveBasketItemHandler : IRequestHandler<RemoveBasketItemRequest>
       return Errors.BasketNotFound;
 
     var error = basket.RemoveItem(request.ProductId);
-    if(error.Equals(Error.None))
+    if (error.Equals(Error.None))
     {
       await _repository.UpdateBasket(basket);
       var data = new BasketChangedResponse

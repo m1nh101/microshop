@@ -26,3 +26,5 @@ public record Result<T>
   public static implicit operator Result<T>(Error error) => Failed(error);
   public static implicit operator Result<T>(List<Error> errors) => Failed(errors);
 }
+
+public sealed record EmptyResult;

@@ -30,18 +30,12 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\Share\API.Contract\API.Contract.csproj" />
-    <ProjectReference Include="..\..\Share\Auth\Auth.csproj" />
     <ProjectReference Include="..\..\Share\Common\Common.csproj" />
   </ItemGroup>
 
 	<ItemGroup>
 		<Protobuf Include="RPC\Protos\product.proto" />
 		<Protobuf Include="RPC\Protos\basket.proto" />
-	</ItemGroup>
-
-	<ItemGroup>
-	  <Folder Include="Intergrated\EventHandlers\" />
-	  <Folder Include="Intergrated\Events\" />
 	</ItemGroup>
 
 </Project>

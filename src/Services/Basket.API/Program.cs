@@ -1,9 +1,9 @@
-using Auth;
-using Common.Mediator;
 using Basket.API;
 using Basket.API.HostedServices;
 using Basket.API.Repositories;
 using Basket.API.RPC.Clients;
+using Common.Auth;
+using Common.Mediator;
 using Grpc.Net.Client;
 using Redis.OM;
 using Redis.OM.Contracts;
