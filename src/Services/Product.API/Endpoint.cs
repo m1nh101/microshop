@@ -1,5 +1,4 @@
 ﻿using API.Contract.Products.Requests;
-using API.Contract.Products.Responses;
 using Common;
 using Common.Mediator;
 using Microsoft.AspNetCore.Mvc;
@@ -36,7 +35,7 @@ public static class Endpoint
     [FromServices] IMediator mediator,
     [FromBody] CreateProductRequest request)
   {
-    var result = await mediator.Send(request).As<Result<ProductDetailResponse>>();
+    var result = await mediator.Send(request);
 
     return GenerateHttpResponse(result);
   }
@@ -46,7 +45,7 @@ public static class Endpoint
     [FromBody] EditProductRequest request,
     [FromRoute] string id)
   {
-    var result = await mediator.Send(request).As<Result<ProductDetailResponse>>();
+    var result = await mediator.Send(request);
 
     return GenerateHttpResponse(result);
   }
@@ -56,7 +55,7 @@ public static class Endpoint
     [FromRoute] string id)
   {
     var command = new RemoveProductRequest() { Id = id };
-    var result = await mediator.Send(command).As<Result<RemoveProductResponse>>();
+    var result = await mediator.Send(command);
 
     return GenerateHttpResponse(result);
   }
@@ -65,7 +64,7 @@ public static class Endpoint
     [FromServices] IMediator mediator)
   {
     var query = new GetOptionRequest();
-    var result = await mediator.Send(query).As<Result<FilterOptionResponse>>();
+    var result = await mediator.Send(query);
 
     return GenerateHttpResponse(result);
   }
@@ -75,7 +74,7 @@ public static class Endpoint
     [FromRoute] string id)
   {
     var query = new GetProductByIdRequest { Id = id };
-    var result = await mediator.Send(query).As<Result<ProductDetailResponse>>();
+    var result = await mediator.Send(query);
     return GenerateHttpResponse(result);
   }
 
@@ -93,11 +92,11 @@ public static class Endpoint
       Name = name,
       TypeId = typeId,
     };
-    var result = await mediator.Send(query).As<Result<IEnumerable<ProductPaginationResponse>>>();
+    var result = await mediator.Send(query);
     return GenerateHttpResponse(result);
   }
 
-  private static IResult GenerateHttpResponse(Result<object> result)
+  private static IResult GenerateHttpResponse(Result result)
   {
     return result.IsSuccess ? TypedResults.Ok(result.Data) : TypedResults.BadRequest(result.Errors);
   }

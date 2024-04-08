@@ -26,7 +26,7 @@ public static class Endpoint
     [FromServices] IMediator mediator,
     [FromBody] CreateOrderRequest request)
   {
-    var result = await mediator.Send(request).As<Result<CustomerOrderResponse>>();
+    var result = await mediator.Send(request);
 
     return GenerateHttpResponse(result);
   }
@@ -36,16 +36,17 @@ public static class Endpoint
     [FromRoute] string orderId)
   {
     var command = new CancelOrderRequest(orderId);
-    var result = await mediator.Send(command).As<Result<Common.EmptyResult>>();
 
-    return GenerateHttpResponse(result);
+    await mediator.Send(command);
+
+    return TypedResults.NoContent();
   }
 
   private static async Task<IResult> GetOrderEndpoint(
     [FromServices] IMediator mediator)
   {
     var query = new GetOrderRequest();
-    var result = await mediator.Send(query).As<Result<IEnumerable<OrderResponse>>>();
+    var result = await mediator.Send(query);
 
     return GenerateHttpResponse(result);
   }
@@ -54,7 +55,7 @@ public static class Endpoint
     [FromServices] IMediator mediator)
   {
     var query = new GetUserOrderRequest();
-    var result = await mediator.Send(query).As<Result<IEnumerable<UserOrderResponse>>>();
+    var result = await mediator.Send(query);
 
     return GenerateHttpResponse(result);
   }
@@ -64,12 +65,12 @@ public static class Endpoint
     [FromRoute] string orderId)
   {
     var query = new GetOrderDetailRequest(orderId);
-    var result = await mediator.Send(query).As<Result<CustomerOrderResponse>>();
+    var result = await mediator.Send(query);
 
     return GenerateHttpResponse(result);
   }
 
-  private static IResult GenerateHttpResponse(Result<object> result)
+  private static IResult GenerateHttpResponse(Result result)
   {
     return result.IsSuccess ? TypedResults.Ok(result.Data) : TypedResults.BadRequest(result.Errors);
   }

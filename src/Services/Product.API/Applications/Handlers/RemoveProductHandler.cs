@@ -16,16 +16,16 @@ public class RemoveProductHandler : IRequestHandler<RemoveProductRequest>
     _context = context;
   }
 
-  public async Task<object> Handle(RemoveProductRequest request)
+  public async Task<Result> Handle(RemoveProductRequest request)
   {
     var product = await _context.Products.FirstOrDefaultAsync(e => e.Id == request.Id);
     if (product == null)
-      return Errors.ProductNotFound;
+      return Result.Failed(Errors.ProductNotFound);
 
     product.UpdateAvailableStatus(false);
 
     await _context.SaveChangesAsync();
 
-    return Result<RemoveProductResponse>.Ok(new RemoveProductResponse());
+    return Result.Ok();
   }
 }

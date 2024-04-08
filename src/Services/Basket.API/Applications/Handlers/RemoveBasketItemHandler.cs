@@ -20,11 +20,11 @@ public class RemoveBasketItemHandler : IRequestHandler<RemoveBasketItemRequest>
     _repository = repository;
   }
 
-  public async Task<object> Handle(RemoveBasketItemRequest request)
+  public async Task<Result> Handle(RemoveBasketItemRequest request)
   {
     var basket = await _repository.GetBasket(_session.UserId);
     if (basket is null)
-      return Errors.BasketNotFound;
+      return Result.Failed(Errors.BasketNotFound);
 
     var error = basket.RemoveItem(request.ProductId);
     if (error.Equals(Error.None))
@@ -38,9 +38,9 @@ public class RemoveBasketItemHandler : IRequestHandler<RemoveBasketItemRequest>
         NewTotalBasketPrice = basket.TotalPrice
       };
 
-      return Result<BasketChangedResponse>.Ok(data);
+      return Result.Ok(data);
     }
 
-    return error;
+    return Result.Failed(error);
   }
 }

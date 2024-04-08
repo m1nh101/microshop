@@ -22,7 +22,7 @@ public class GetUserOrderHandler : IRequestHandler<GetUserOrderRequest>
     _session = session;
   }
 
-  public async Task<object> Handle(GetUserOrderRequest request)
+  public async Task<Result> Handle(GetUserOrderRequest request)
   {
     var orders = await _context.Orders.AsNoTracking()
       .Where(e => e.UserId == _session.UserId)
@@ -35,6 +35,6 @@ public class GetUserOrderHandler : IRequestHandler<GetUserOrderRequest>
         e.Items))
       .ToListAsync();
 
-    return Result<IEnumerable<UserOrderResponse>>.Ok(orders);
+    return Result.Ok(orders);
   }
 }

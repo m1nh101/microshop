@@ -32,11 +32,11 @@ public class CreateOrderHandler : IRequestHandler<CreateOrderRequest>
     _eventBus = eventBus;
   }
 
-  public async Task<object> Handle(CreateOrderRequest request)
+  public async Task<Result> Handle(CreateOrderRequest request)
   {
     var itemsInBasket = await _basketClient.GetBasket(_session.UserId);
     if (itemsInBasket == null || !itemsInBasket.Any())
-      return Result<CustomerOrderResponse>.Failed(Errors.EmptyBasket);
+      return Result.Failed(Errors.EmptyBasket);
 
     var items = itemsInBasket.Select(e => new OrderItem(e.ProductId, e.ProductName, e.PictureUri, e.Price, e.Quantity));
     var order = new BuyerOrder(_session.UserId, _session.Name, request.ShippingAddress, items);
@@ -49,7 +49,7 @@ public class CreateOrderHandler : IRequestHandler<CreateOrderRequest>
       order.UserId,
       order.Items));
 
-    return Result<CustomerOrderResponse>.Ok(new CustomerOrderResponse(
+    return Result.Ok(new CustomerOrderResponse(
       order.Id,
       order.GetTotal(),
       order.Status,

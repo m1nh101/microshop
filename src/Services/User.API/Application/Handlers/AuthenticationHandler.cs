@@ -37,19 +37,19 @@ public class AuthenticationHandler : IRequestHandler<AuthenticateCommand>
     _refreshTokenGenerator = refreshTokenGenerator;
   }
 
-  public async Task<object> Handle(AuthenticateCommand request)
+  public async Task<Result> Handle(AuthenticateCommand request)
   {
     var user = await _context.Users
       .Include(e => e.Roles)
       .FirstOrDefaultAsync(e => e.Username == request.Username);
 
     if (user == null)
-      return Result<AuthenticateResponse>.Failed(new Error("User.NotFound", "username/email is not exist in system"));
+      return Result.Failed(new Error("User.NotFound", "username/email is not exist in system"));
 
 
     var password = _passwordGenerator.Generate(request.Password);
     if (password != user.Password)
-      return Result<AuthenticateResponse>.Failed(new Error("User.WrongPassword", "password is incorrect!"));
+      return Result.Failed(new Error("User.WrongPassword", "password is incorrect!"));
 
     // get role of user;
     // maybe violet S in SOLID;
@@ -75,6 +75,6 @@ public class AuthenticationHandler : IRequestHandler<AuthenticateCommand>
 
     // write http-cookie to response
 
-    return Result<AuthenticateResponse>.Ok(new(user.Id, accessToken, userToken.RefreshToken));
+    return Result.Ok<AuthenticateResponse>(new(user.Id, accessToken, userToken.RefreshToken));
   }
 }

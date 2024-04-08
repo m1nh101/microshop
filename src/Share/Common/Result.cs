@@ -1,30 +1,33 @@
 ﻿namespace Common;
 
-public record Result<T>
-  where T : class
+public record Result
 {
-  public Result(
-    ResultType resultType,
-    T? data,
-    IEnumerable<Error>? errors)
+  public Result(Error? error)
   {
-    Errors = errors;
-    ResultType = resultType;
-    Data = data;
+    Errors = error is null ? null : [error];
+    IsSuccess = error is null;
   }
 
-  public IEnumerable<Error>? Errors { get; init; }
-  public T? Data { get; init; }
-  public ResultType ResultType { get; init; }
-  public bool IsSuccess => Errors is null;
+  public Result(IEnumerable<Error>? errors)
+  {
+    Errors = errors;
+    IsSuccess = errors is null;
+  }
 
-  public static Result<T> Ok(T data) => new(ResultType.Ok, data, default);
-  public static Result<T> Failed(Error error) => new(ResultType.Failed, default, [error]);
-  public static Result<T> Failed(IEnumerable<Error> errors) => new(ResultType.Failed, default, errors);
+  public IEnumerable<Error>? Errors { get; set; }
+  public bool IsSuccess { get; protected set; }
+  public object? Data { get; init; }
 
-  public static implicit operator Result<T>(T data) => Ok(data);
-  public static implicit operator Result<T>(Error error) => Failed(error);
-  public static implicit operator Result<T>(List<Error> errors) => Failed(errors);
+  public static Result Failed(Error error) => new(error);
+  public static Result Failed(IEnumerable<Error> errors) => new(errors);
+  public static Result Ok() => new(error: null) { IsSuccess = true };
+  public static Result Ok<TData>(TData data) => new(error: null) { Data = data };
+
+  public TData As<TData>()
+  {
+    if (Data is null)
+      throw new CastingDataTypeException(typeof(TData));
+
+    return (TData)Data;
+  }
 }
-
-public sealed record EmptyResult;

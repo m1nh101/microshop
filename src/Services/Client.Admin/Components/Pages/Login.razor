@@ -1,5 +1,6 @@
 ﻿@page "/login"
 @using API.Contract.Users.Requests
+@using API.Contract.Users.Responses
 @using Client.Admin.Services
 @using Microsoft.AspNetCore.Antiforgery
 @attribute [RequireAntiforgeryToken(required: false)]
@@ -47,7 +48,8 @@
 
     if(response.IsSuccess)
     {
-      var accessToken = response.Data!.AccessToken;
+      var result = response.As<AuthenticateResponse>();
+      var accessToken = result.AccessToken;
 
       HttpContext.Response.Cookies.Append("access_token", accessToken, new CookieOptions
       {

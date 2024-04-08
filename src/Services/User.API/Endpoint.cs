@@ -27,12 +27,13 @@ public static class Endpoint
   {
     var userAgent = httpContext.Request.Headers.UserAgent;
     var command = new AuthenticateCommand(request.Username, request.Password, userAgent!);
-    var result = await mediator.Send(command)
-      .As<Result<AuthenticateResponse>>();
+    var result = await mediator.Send(command);
 
     if (result.IsSuccess)
     {
-      httpContext.Response.Cookies.Append("access_token", result.Data!.AccessToken, new CookieOptions
+      var data = result.As<AuthenticateResponse>();
+
+      httpContext.Response.Cookies.Append("access_token", data.AccessToken, new CookieOptions
       {
         Secure = true,
         HttpOnly = true,
@@ -40,7 +41,7 @@ public static class Endpoint
         Path = "/"
       });
 
-      httpContext.Response.Cookies.Append("refresh_token", result.Data!.RefreshToken, new CookieOptions
+      httpContext.Response.Cookies.Append("refresh_token", data.RefreshToken, new CookieOptions
       {
         Secure = true,
         HttpOnly = true,
@@ -58,8 +59,7 @@ public static class Endpoint
     [FromServices] IMediator mediator,
     [FromBody] RegisterRequest request)
   {
-    var result = await mediator.Send(request)
-      .As<Result<RegisterResponse>>();
+    var result = await mediator.Send(request);
 
     return GenerateHttpResponse(result);
   }
@@ -72,8 +72,7 @@ public static class Endpoint
     var refreshToken = httpContext.Request.Cookies["refresh_token"]?.ToString()
       ?? httpContext.Request.Query["refreshToken"].ToString();
     var request = new RequireAccessTokenCommand(refreshToken, userAgent!);
-    var result = await mediator.Send(request)
-      .As<Result<RequireAccessTokenResponse>>();
+    var result = await mediator.Send(request);
 
     return GenerateHttpResponse(result);
   }
@@ -82,8 +81,7 @@ public static class Endpoint
     [FromServices] IMediator mediator,
     HttpContext httpContext)
   {
-    await mediator.Send(new RevokeTokenCommand())
-      .As<Error>();
+    await mediator.Send(new RevokeTokenCommand());
 
     httpContext.Response.Cookies.Delete("refresh_token");
     httpContext.Response.Cookies.Delete("access_token");
@@ -91,7 +89,7 @@ public static class Endpoint
     return TypedResults.NoContent();
   }
 
-  private static IResult GenerateHttpResponse(Result<object> result)
+  private static IResult GenerateHttpResponse(Result result)
   {
     return result.IsSuccess ? TypedResults.Ok(result.Data) : TypedResults.BadRequest(result.Errors);
   }

@@ -10,31 +10,31 @@ public class ProductService : BaseService
   {
   }
 
-  public Task<Result<IEnumerable<ProductPaginationResponse>>> GetProducts(GetProductPaginationRequest request)
+  public Task<Result> GetProducts(GetProductPaginationRequest request)
   {
     var queryString = ConvertObjToUri(request);
-    return MakeRequest<IEnumerable<ProductPaginationResponse>>($"/product-api/products?{queryString}", HttpMethod.GET);
+    return MakeRequest($"/product-api/products?{queryString}", HttpMethod.GET);
   }
 
-  public Task<Result<ProductDetailResponse>> GetProduct(string productId)
+  public Task<Result> GetProduct(string productId)
   {
-    return MakeRequest<ProductDetailResponse>($"/product-api/products/{productId}", HttpMethod.GET);
+    return MakeRequest($"/product-api/products/{productId}", HttpMethod.GET);
   }
 
-  public Task<Result<ProductDetailResponse>> CreateProduct(CreateProductRequest request, string accessToken)
+  public Task<Result> CreateProduct(CreateProductRequest request, string accessToken)
   {
     SetCredential(accessToken);
     return MakeRequest<ProductDetailResponse>("/product-api/products", request, HttpMethod.POST);
   }
 
-  public Task<Result<ProductDetailResponse>> EditProduct(EditProductRequest request, string accessToken)
+  public Task<Result> EditProduct(EditProductRequest request, string accessToken)
   {
     SetCredential(accessToken);
     return MakeRequest<ProductDetailResponse>($"/product-api/products/{request.Id}", request, HttpMethod.PUT);
   }
 
-  public Task<Result<FilterOptionResponse>> GetListOption()
+  public Task<Result> GetListOption()
   {
-    return MakeRequest<FilterOptionResponse>("/product-api/products/list-option", HttpMethod.GET);
+    return MakeRequest("/product-api/products/list-option", HttpMethod.GET);
   }
 }

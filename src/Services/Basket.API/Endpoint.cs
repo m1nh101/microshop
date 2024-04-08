@@ -23,7 +23,7 @@ public static class Endpoint
     [FromServices] IMediator mediator)
   {
     var query = new GetBasketRequest();
-    var result = await mediator.Send(query).As<Result<CustomerBasket>>();
+    var result = await mediator.Send(query);
 
     return GenerateHttpResponse(result);
   }
@@ -32,7 +32,7 @@ public static class Endpoint
     [FromServices] IMediator mediator,
     [FromBody] AddOrUpdateBasketItemRequest request)
   {
-    var result = await mediator.Send(request).As<Result<BasketChangedResponse>>();
+    var result = await mediator.Send(request);
     return GenerateHttpResponse(result);
   }
 
@@ -41,12 +41,12 @@ public static class Endpoint
     [FromRoute] string id)
   {
     var command = new RemoveBasketItemRequest(id);
-    var result = await mediator.Send(command).As<Result<BasketChangedResponse>>();
+    var result = await mediator.Send(command);
 
     return GenerateHttpResponse(result);
   }
 
-  private static IResult GenerateHttpResponse(Result<object> result)
+  private static IResult GenerateHttpResponse(Result result)
   {
     return result.IsSuccess ? TypedResults.Ok(result.Data) : TypedResults.BadRequest(result.Errors);
   }

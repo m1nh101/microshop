@@ -3,5 +3,5 @@
 public interface IRequestHandler<in T>
   where T : class
 {
-  Task<object> Handle(T request);
+  Task<Result> Handle(T request);
 }

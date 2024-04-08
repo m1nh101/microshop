@@ -16,7 +16,7 @@ public class CreateProductHandler : IRequestHandler<CreateProductRequest>
     _context = context;
   }
 
-  public async Task<object> Handle(CreateProductRequest request)
+  public async Task<Result> Handle(CreateProductRequest request)
   {
     var product = new ProductItem(
       name: request.Name,
@@ -41,6 +41,6 @@ public class CreateProductHandler : IRequestHandler<CreateProductRequest>
       TypeId: product.TypeId,
       Description: product.Description);
 
-    return Result<ProductDetailResponse>.Ok(result);
+    return Result.Ok(result);
   }
 }

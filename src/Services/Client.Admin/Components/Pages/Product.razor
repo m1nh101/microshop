@@ -195,7 +195,7 @@
     var request = ToRequest(Request);
     var response = await Service.GetProducts(request);
 
-    Products = response.Data!;
+    Products = response.As<IEnumerable<ProductPaginationResponse>>();
   }
 
   private async Task OpenCreateForm()
@@ -236,7 +236,7 @@
     var response = await Service.GetProduct(id);
     if (response.IsSuccess)
     {
-      var data = response.Data!;
+      var data = response.As<ProductDetailResponse>();
       Payload = new InputRequest
         {
           Name = data.Name,
@@ -307,8 +307,9 @@
     }
 
     var options = await Service.GetListOption();
-    BrandOptions = options.Data!.BrandOptions;
-    TypeOptions = options.Data!.TypeOptions;
+    var data = options.As<FilterOptionResponse>();
+    BrandOptions = data.BrandOptions;
+    TypeOptions = data.TypeOptions;
     await Filter();
   }
 }

@@ -29,12 +29,12 @@ public class RequireAccessTokenHandler : IRequestHandler<RequireAccessTokenComma
     _accessTokenGenerator = accessTokenGenerator;
   }
 
-  public async Task<object> Handle(RequireAccessTokenCommand request)
+  public async Task<Result> Handle(RequireAccessTokenCommand request)
   {
     // check token validation
     var token = await _cache.GetTokenByRefreshToken(request.RefreshToken, request.UserAgent);
     if (token == null)
-      return Errors.RefreshTokenIsNotValid;
+      return Result.Failed(Errors.RefreshTokenIsNotValid);
 
     var user = await _context.Users
       .Include(e => e.Roles)
@@ -48,6 +48,6 @@ public class RequireAccessTokenHandler : IRequestHandler<RequireAccessTokenComma
 
     var accessToken = _accessTokenGenerator.Generate(user, roles);
 
-    return Result<RequireAccessTokenResponse>.Ok(new RequireAccessTokenResponse(accessToken));
+    return Result.Ok(new RequireAccessTokenResponse(accessToken));
   }
 }

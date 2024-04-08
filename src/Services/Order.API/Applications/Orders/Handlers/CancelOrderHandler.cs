@@ -23,15 +23,15 @@ public class CancelOrderHandler : IRequestHandler<CancelOrderRequest>
     _session = session;
   }
 
-  public async Task<object> Handle(CancelOrderRequest request)
+  public async Task<Result> Handle(CancelOrderRequest request)
   {
     var order = await _context.Orders.FirstOrDefaultAsync(e => e.Id == request.OrderId && e.UserId == _session.UserId);
     if (order is null)
-      return Result<EmptyResult>.Failed(Errors.NotFound);
+      return Result.Failed(Errors.NotFound);
 
     order.SetStatus(OrderStatus.Canceled);
     await _context.SaveChangesAsync();
 
-    return Result<EmptyResult>.Ok(new EmptyResult());
+    return Result.Ok();
   }
 }

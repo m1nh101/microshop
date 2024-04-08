@@ -36,7 +36,7 @@ public abstract class BaseService
     };
   }
 
-  protected async Task<Result<T>> MakeRequest<T>(string uri, object req, HttpMethod httpMethod)
+  protected async Task<Result> MakeRequest<T>(string uri, object req, HttpMethod httpMethod)
     where T : class
   {
     var payload = new StringContent(
@@ -46,24 +46,23 @@ public abstract class BaseService
     var httpResponse = await SendRequest(uri, payload, httpMethod);
     var rawDataResponse = await httpResponse.Content.ReadAsStringAsync();
 
-    return JsonConvert.DeserializeObject<Result<T>>(rawDataResponse)!;
+    return JsonConvert.DeserializeObject<Result>(rawDataResponse)!;
   }
 
-  protected async Task<Result<T>> MakeRequest<T>(string uri, HttpMethod httpMethod)
-    where T : class
+  protected async Task<Result> MakeRequest(string uri, HttpMethod httpMethod)
   {
     var httpResponse = await SendRequest(uri, httpMethod: httpMethod);
     var rawDataResponse = await httpResponse.Content.ReadAsStringAsync();
 
-    return JsonConvert.DeserializeObject<Result<T>>(rawDataResponse)!;
+    return JsonConvert.DeserializeObject<Result>(rawDataResponse)!;
   }
 
-  protected async Task<bool> MakeRequest(string uri, HttpMethod httpMethod)
-  {
-    var httpResponse = await SendRequest(uri, httpMethod: httpMethod);
+  //protected async Task<bool> MakeRequest(string uri, HttpMethod httpMethod)
+  //{
+  //  var httpResponse = await SendRequest(uri, httpMethod: httpMethod);
 
-    return httpResponse.StatusCode == System.Net.HttpStatusCode.NoContent;
-  }
+  //  return httpResponse.StatusCode == System.Net.HttpStatusCode.NoContent;
+  //}
 
   protected void SetCredential(string accessToken)
   {

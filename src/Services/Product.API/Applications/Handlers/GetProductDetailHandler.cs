@@ -16,7 +16,7 @@ public class GetProductDetailHandler : IRequestHandler<GetProductByIdRequest>
     _context = context;
   }
 
-  public async Task<object> Handle(GetProductByIdRequest request)
+  public async Task<Result> Handle(GetProductByIdRequest request)
   {
     var product = await _context.Products
       .AsNoTracking()
@@ -33,8 +33,8 @@ public class GetProductDetailHandler : IRequestHandler<GetProductByIdRequest>
       .FirstOrDefaultAsync();
 
     if (product is null)
-      return Errors.ProductNotFound;
+      return Result.Failed(Errors.ProductNotFound);
 
-    return Result<ProductDetailResponse>.Ok(product);
+    return Result.Ok(product);
   }
 }

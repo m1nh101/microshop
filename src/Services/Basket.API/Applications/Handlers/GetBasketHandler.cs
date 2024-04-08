@@ -21,13 +21,13 @@ public sealed class GetBasketHandler : IRequestHandler<GetBasketRequest>
     _repository = repository;
   }
 
-  public async Task<object> Handle(GetBasketRequest request)
+  public async Task<Result> Handle(GetBasketRequest request)
   {
     var basket = await _repository.GetBasket(_session.UserId);
     if (basket is null)
-      return Errors.BasketNotFound;
+      return Result.Failed(Errors.BasketNotFound);
 
-    return Result<CustomerBasket>.Ok(basket);
+    return Result.Ok(basket);
   }
 }
 

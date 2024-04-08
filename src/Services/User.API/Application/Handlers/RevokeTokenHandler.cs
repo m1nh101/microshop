@@ -20,10 +20,10 @@ public class RevokeTokenHandler : IRequestHandler<RevokeTokenCommand>
     _session = session;
   }
 
-  public async Task<object> Handle(RevokeTokenCommand request)
+  public async Task<Result> Handle(RevokeTokenCommand request)
   {
     await _cache.RevokeRefreshToken(_session.UserId);
 
-    return Result<EmptyResult>.Ok(new EmptyResult());
+    return Result.Ok();
   }
 }

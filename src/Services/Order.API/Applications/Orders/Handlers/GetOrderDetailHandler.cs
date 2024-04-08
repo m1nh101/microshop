@@ -23,13 +23,13 @@ public class GetOrderDetailHandler : IRequestHandler<GetOrderDetailRequest>
     _session = session;
   }
 
-  public async Task<object> Handle(GetOrderDetailRequest request)
+  public async Task<Result> Handle(GetOrderDetailRequest request)
   {
     var order = await _context.Orders.FirstOrDefaultAsync(e => e.Id == request.OrderId && e.UserId == _session.UserId);
     if (order is null)
-      return Result<CustomerOrderResponse>.Failed(Errors.NotFound);
+      return Result.Failed(Errors.NotFound);
 
-    return Result<CustomerOrderResponse>.Ok(new CustomerOrderResponse(
+    return Result.Ok(new CustomerOrderResponse(
       order.Id,
       order.GetTotal(),
       order.Status,

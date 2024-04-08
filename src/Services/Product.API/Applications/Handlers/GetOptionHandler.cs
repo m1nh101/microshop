@@ -17,7 +17,7 @@ public class GetOptionHandler : IRequestHandler<GetOptionRequest>
     _context = context;
   }
 
-  public async Task<object> Handle(GetOptionRequest request)
+  public async Task<Result> Handle(GetOptionRequest request)
   {
     var brandOptions = await _context.Brands
       .AsNoTracking()
@@ -37,6 +37,6 @@ public class GetOptionHandler : IRequestHandler<GetOptionRequest>
       .ToListAsync();
     var data = new FilterOptionResponse(brandOptions, typeOptions);
 
-    return Result<FilterOptionResponse>.Ok(data);
+    return Result.Ok(data);
   }
 }

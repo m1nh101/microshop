@@ -25,7 +25,7 @@ public sealed class AddOrUpdateBasketItemHandler : IRequestHandler<AddOrUpdateBa
     _productClient = productClient;
   }
 
-  public async Task<object> Handle(AddOrUpdateBasketItemRequest request)
+  public async Task<Result> Handle(AddOrUpdateBasketItemRequest request)
   {
     var basket = await _repository.GetBasket(_session.UserId)
         ?? new CustomerBasket() { CustomerId = _session.UserId };
@@ -33,11 +33,11 @@ public sealed class AddOrUpdateBasketItemHandler : IRequestHandler<AddOrUpdateBa
     // check product is valid or not
     var product = await _productClient.GetProduct(request.ProductId);
     if (product is null)
-      return Errors.InvalidProduct;
+      return Result.Failed(Errors.InvalidProduct);
 
     // check quantity is valid or not
     if (product.AvailableStock < request.Quantity)
-      return Errors.InvalidQuantity;
+      return Result.Failed(Errors.InvalidQuantity);
 
     var basketItem = new BasketItem
     {
@@ -48,7 +48,7 @@ public sealed class AddOrUpdateBasketItemHandler : IRequestHandler<AddOrUpdateBa
 
     Error[] errors = [basketItem.SetQuantity(request.Quantity), basketItem.SetPrice(product.Price)];
     if (errors.Where(e => !e.Equals(Error.None)).Any())
-      return Result<BasketChangedResponse>.Failed(errors);
+      return Result.Failed(errors);
 
     basket.AddOrUpdate(basketItem);
 
@@ -62,6 +62,6 @@ public sealed class AddOrUpdateBasketItemHandler : IRequestHandler<AddOrUpdateBa
       NewTotalBasketPrice = basket.TotalPrice
     };
 
-    return Result<BasketChangedResponse>.Ok(response);
+    return Result.Ok(response);
   }
 }

@@ -17,7 +17,7 @@ public class GetProductPaginationHandler : IRequestHandler<GetProductPaginationR
     _context = context;
   }
 
-  public async Task<object> Handle(GetProductPaginationRequest request)
+  public async Task<Result> Handle(GetProductPaginationRequest request)
   {
     var query = _context.Products
       .Include(e => e.Type)
@@ -45,6 +45,6 @@ public class GetProductPaginationHandler : IRequestHandler<GetProductPaginationR
         e.Description))
       .ToListAsync();
 
-    return Result<IEnumerable<ProductPaginationResponse>>.Ok(products);
+    return Result.Ok(products);
   }
 }

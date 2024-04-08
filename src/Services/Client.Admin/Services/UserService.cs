@@ -10,18 +10,19 @@ public class UserService : BaseService
   {
   }
 
-  public Task<Result<AuthenticateResponse>> Authenticate(AuthenticateRequest req)
+  public Task<Result> Authenticate(AuthenticateRequest req)
   {
     return MakeRequest<AuthenticateResponse>("/user-api/users/auth", req, HttpMethod.POST);
   }
 
-  public Task<Result<RegisterResponse>> Register(RegisterRequest req)
+  public Task<Result> Register(RegisterRequest req)
   {
     return MakeRequest<RegisterResponse>("/user-api/users/register", req, HttpMethod.POST);
   }
 
-  public Task<bool> Signout()
+  public Task<Result> Signout()
   {
-    return MakeRequest("/user-api/users/sign-out", HttpMethod.DELETE);
+    throw new Exception();
+    //return MakeRequest<RegisterResponse>("/user-api/users/sign-out", HttpMethod.DELETE);
   }
 }

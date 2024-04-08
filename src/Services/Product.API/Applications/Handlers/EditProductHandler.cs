@@ -17,11 +17,11 @@ public class EditProductHandler : IRequestHandler<EditProductRequest>
     _context = context;
   }
 
-  public async Task<object> Handle(EditProductRequest request)
+  public async Task<Result> Handle(EditProductRequest request)
   {
     var product = await _context.Products.FirstOrDefaultAsync(e => e.Id == request.Id);
     if (product == null)
-      return Errors.ProductNotFound;
+      return Result.Failed(Errors.ProductNotFound);
 
     product.Update(new ProductItem(
       name: request.Name,
@@ -44,6 +44,6 @@ public class EditProductHandler : IRequestHandler<EditProductRequest>
       TypeId: product.TypeId,
       Description: product.Description);
 
-    return Result<ProductDetailResponse>.Ok(result);
+    return Result.Ok(result);
   }
 }

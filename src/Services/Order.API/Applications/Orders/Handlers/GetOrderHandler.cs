@@ -17,7 +17,7 @@ public class GetOrderHandler : IRequestHandler<GetOrderRequest>
     _context = context;
   }
 
-  public async Task<object> Handle(GetOrderRequest request)
+  public async Task<Result> Handle(GetOrderRequest request)
   {
     var orders = await _context.Orders.AsNoTracking()
       .Select(e => new OrderResponse(
@@ -31,6 +31,6 @@ public class GetOrderHandler : IRequestHandler<GetOrderRequest>
         e.Items))
       .ToListAsync();
 
-    return Result<IEnumerable<OrderResponse>>.Ok(orders);
+    return Result.Ok(orders);
   }
 }

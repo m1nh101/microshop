@@ -1,5 +1,4 @@
 ﻿using API.Contract.Users.Requests;
-using API.Contract.Users.Responses;
 using Common;
 using Common.Mediator;
 using Microsoft.EntityFrameworkCore;
@@ -21,7 +20,7 @@ public class RegisterHandler : IRequestHandler<RegisterRequest>
     _context = context;
   }
 
-  public async Task<object> Handle(RegisterRequest request)
+  public async Task<Result> Handle(RegisterRequest request)
   {
     var errors = new List<Error>();
 
@@ -43,7 +42,7 @@ public class RegisterHandler : IRequestHandler<RegisterRequest>
       errors.Add(Errors.ConfirmPasswordNotMatch);
 
     if (errors.Count != 0)
-      return errors;
+      return Result.Failed(errors);
 
     var user = new Infrastructure.Entities.User(
       username: request.Username,
@@ -61,6 +60,6 @@ public class RegisterHandler : IRequestHandler<RegisterRequest>
     await _context.Users.AddAsync(user);
     await _context.SaveChangesAsync();
 
-    return Result<RegisterResponse>.Ok(new RegisterResponse());
+    return Result.Ok();
   }
 }
