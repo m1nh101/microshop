@@ -2,6 +2,7 @@ using Basket.API;
 using Basket.API.HostedServices;
 using Basket.API.Repositories;
 using Basket.API.RPC.Clients;
+using Basket.API.RPC.Services;
 using Common.Auth;
 using Common.EventBus;
 using Common.Mediator;
@@ -21,6 +22,8 @@ builder.Services.AddSingleton<IRedisConnectionProvider>(sp =>
 
   return new RedisConnectionProvider(configuration);
 });
+
+builder.Services.AddGrpc();
 
 builder.Services.AddSingleton(sp =>
 {
@@ -51,6 +54,8 @@ builder.Services.AddEventBus(typeof(Program).Assembly, builder.Configuration);
 var app = builder.Build();
 
 // Configure the HTTP request pipeline
+
+app.MapGrpcService<BasketRgpcService>();
 
 app.UseHttpsRedirection();
 

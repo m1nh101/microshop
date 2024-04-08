@@ -28,7 +28,8 @@ public sealed class TokenGenerator : IRefreshTokenGenerator, IAccessTokenGenerat
     var claims = new List<Claim>()
     {
       new(ClaimTypes.NameIdentifier, user.Id),
-      new(ClaimTypes.Name, user.Username)
+      new(ClaimTypes.Name, user.Username),
+      new(ClaimTypes.GivenName, user.Name)
     }.Union(roleClaims);
 
     var tokenDescription = new SecurityTokenDescriptor

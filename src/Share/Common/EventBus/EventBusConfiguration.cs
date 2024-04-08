@@ -15,7 +15,14 @@ public static class EventBusConfiguration
     {
       return new ConnectionFactory
       {
-        HostName = configuration["MQ_HOST"]
+        HostName = configuration["MQ_HOST"],
+        Ssl = new SslOption
+        {
+          CertificateValidationCallback = (sender, cert, chain, policy) =>
+          {
+            return true;
+          }
+        }
       };
     });
 

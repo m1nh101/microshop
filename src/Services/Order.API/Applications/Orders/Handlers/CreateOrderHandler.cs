@@ -34,6 +34,8 @@ public class CreateOrderHandler : IRequestHandler<CreateOrderRequest>
 
   public async Task<Result> Handle(CreateOrderRequest request)
   {
+    Console.WriteLine("Start creating order");
+
     var itemsInBasket = await _basketClient.GetBasket(_session.UserId);
     if (itemsInBasket == null || !itemsInBasket.Any())
       return Result.Failed(Errors.EmptyBasket);
