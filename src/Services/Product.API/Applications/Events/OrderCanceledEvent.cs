@@ -4,31 +4,27 @@ using Product.API.Infrastructure.Database;
 
 namespace Product.API.Applications.Events;
 
-public record OrderItem(
-  string ProductId,
-  int Quantity);
-
-public record OrderCreatedEvent(
+public sealed record OrderCanceledEvent(
   string OrderId,
   IEnumerable<OrderItem> Items) : IntergratedEvent;
 
-public sealed class OrderCreatedEventHandler : IEventHandler<OrderCreatedEvent>
+public sealed class OrderCancelEventHandler : IEventHandler<OrderCanceledEvent>
 {
   private readonly ProductDbContext _context;
 
-  public OrderCreatedEventHandler(ProductDbContext context)
+  public OrderCancelEventHandler(ProductDbContext context)
   {
     _context = context;
   }
 
-  public async Task Handle(OrderCreatedEvent @event)
+  public async Task Handle(OrderCanceledEvent @event)
   {
-    foreach (var item in @event.Items)
+    foreach(var item in @event.Items)
     {
       var product = await _context.Products.FirstOrDefaultAsync(e => e.Id == item.ProductId)
         ?? throw new NullReferenceException();
 
-      product.RemoveStock(item.Quantity);
+      product.AddStock(item.Quantity);
     }
 
     await _context.SaveChangesAsync();
