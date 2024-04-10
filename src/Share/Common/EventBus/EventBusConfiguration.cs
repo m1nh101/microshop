@@ -18,11 +18,9 @@ public static class EventBusConfiguration
         HostName = configuration["MQ_HOST"],
         Ssl = new SslOption
         {
-          CertificateValidationCallback = (sender, cert, chain, policy) =>
-          {
-            return true;
-          }
-        }
+          CertificateValidationCallback = (sender, cert, chain, policy) => true
+        },
+        DispatchConsumersAsync = true
       };
     });
 

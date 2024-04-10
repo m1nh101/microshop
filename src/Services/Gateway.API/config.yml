@@ -36,12 +36,14 @@
       Destinations:
         UserService-2:
           Address: https://user-api:443
+          # Address: https://localhost:7100
     ProductService:
       HttpClient:
         DangerousAcceptAnyServerCertificate: true
       LoadBalancingPolicy": RoundRobin
       Destinations:
         ProductService-2:
+          # Address: https://localhost:7295
           Address: https://product-api:443
     BasketService:
       HttpClient:
@@ -49,6 +51,7 @@
       LoadBalancingPolicy": RoundRobin
       Destinations:
         BasketService-2:
+          # Address: https://localhost:7024
           Address: https://basket-api:443
     OrderService:
       HttpClient:
@@ -56,4 +59,5 @@
       LoadBalancingPolicy": RoundRobin
       Destinations:
         OrderService-2:
+          # Address: https://localhost:7003
           Address: https://order-api:443

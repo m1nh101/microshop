@@ -41,7 +41,8 @@ builder.Services.AddSingleton<IBasketClient>(sp =>
   {
     HttpHandler = handler
   };
-  var channel = GrpcChannel.ForAddress("https://basket-api:443", option); // use env 
+  var host = builder.Configuration["BASKET_RPC_CLIENT"] ?? throw new NullReferenceException();
+  var channel = GrpcChannel.ForAddress(host, option); // use env 
   var grpcClient = new BasketRgpc.BasketRgpcClient(channel);
 
   return new BasketRpcClient(grpcClient);

@@ -12,6 +12,8 @@ x-config: &config
     - ASPNETCORE_URLS=https://+:443
     - ASPNETCORE_Kestrel__Certificates__Default__Password=M1ng@2002
     - ASPNETCORE_Kestrel__Certificates__Default__Path=/https/aspnetapp.pfx
+    - BASKET_RPC_CLIENT=https://basket-api:443
+    - PRODUCT_RPC_CLIENT=https://product-api:443
     - MQ_HOST=rabbitmq
   volumes:
     - ~/.aspnet/https:/https:ro

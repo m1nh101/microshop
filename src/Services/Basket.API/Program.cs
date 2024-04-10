@@ -44,7 +44,8 @@ builder.Services.AddSingleton(sp =>
   {
     HttpHandler = handler
   };
-  var channel = GrpcChannel.ForAddress("https://product-api:443", option); //use env
+  var host = builder.Configuration["PRODUCT_RPC_CLIENT"] ?? throw new NullReferenceException();
+  var channel = GrpcChannel.ForAddress(host, option); //use env
   var grpcClient = new ProductRpc.ProductRpcClient(channel);
 
   return new ProductRpcClient(grpcClient);

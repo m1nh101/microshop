@@ -27,14 +27,14 @@ public class RabbitMQEventBus : IHostedService, IEventBus
     where TMessage : IntergratedEvent
   {
     var connection = _connectionFactory.CreateConnection();
+    var eventName = message.GetType().Name;
+    var queueName = $"{Helper.GetAssemblyName<TMessage>}.{eventName}";
     using var channel = connection.CreateModel();
-    var routingKey = message.GetType().Name;
-    channel.QueueDeclare(routingKey);
 
     var json = JsonConvert.SerializeObject(message);
     var body = Encoding.UTF8.GetBytes(json);
-    channel.BasicPublish(exchange: "",
-      routingKey: routingKey,
+    channel.BasicPublish(exchange: eventName,
+      routingKey: eventName,
       mandatory: true,
       body: body);
 
@@ -56,26 +56,30 @@ public class RabbitMQEventBus : IHostedService, IEventBus
         .FirstOrDefault(e => e.GetGenericTypeDefinition() == root)!;
 
       var eventType = extractInterfaceType.GetGenericArguments()[0]!;
-      var routingName = eventType.Name;
 
       var connection = _connectionFactory.CreateConnection();
       var channel = connection.CreateModel();
-      channel.QueueDeclare(routingName);
+      var eventName = eventType.Name;
+      var queueName = $"{Helper.GetAssemblyName(implement)}.{eventName}";
+
+      channel.ExchangeDeclare(eventName, "topic");
+      channel.QueueDeclare(queueName);
+      channel.QueueBind(queueName, eventName, eventName);
 
       var consumer = new AsyncEventingBasicConsumer(channel);
       consumer.Received += async (model, eventArgs) =>
       {
         var body = eventArgs.Body.ToArray();
         var messageString = Encoding.UTF8.GetString(body);
-        var message = JsonConvert.DeserializeObject<IntergratedEvent>(messageString) ?? throw new Exception();
+        var message = JsonConvert.DeserializeObject(messageString, eventType) ?? throw new Exception();
         var scope = _serviceProvider.CreateScope();
-        var handlers = scope.ServiceProvider.GetKeyedServices<IEventHandler>(extractInterfaceType);
+        var handlers = scope.ServiceProvider.GetKeyedServices<IEventHandler>(eventType);
 
         foreach (var handler in handlers)
-          await handler.Handle(message);
+          await handler.Handle((IntergratedEvent)message);
       };
 
-      channel.BasicConsume(queue: routingName, autoAck: true, consumer: consumer);
+      channel.BasicConsume(queue: queueName, autoAck: true, consumer: consumer);
     }
 
     return Task.CompletedTask;
