@@ -14,3 +14,5 @@
 
 ## Backend
 - Add logging
+- Implement concurrency handle same data resource
+- Mail service
