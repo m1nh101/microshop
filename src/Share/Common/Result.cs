@@ -26,7 +26,7 @@ public record Result
   public TData As<TData>()
   {
     if (Data is null)
-      throw new CastingDataTypeException(typeof(TData));
+      throw new InvalidCastException($"casting type from null data is not valid");
 
     return (TData)Data;
   }
