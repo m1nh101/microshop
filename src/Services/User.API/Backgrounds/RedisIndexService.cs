@@ -16,6 +16,7 @@ public sealed class RedisIndexService : IHostedService
   public async Task StartAsync(CancellationToken cancellationToken)
   {
     await _provider.Connection.CreateIndexAsync(typeof(UserToken));
+    await _provider.Connection.CreateIndexAsync(typeof(UserCredential));
   }
 
   public Task StopAsync(CancellationToken cancellationToken)

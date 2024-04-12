@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using User.API.Infrastructure.Entities;
 
 namespace User.API.Infrastructure.Database.Configurations;
 
@@ -32,5 +33,20 @@ public sealed class UserEntityConfiguration : IEntityTypeConfiguration<Entities.
       .IsRequired(true);
 
     builder.HasIndex(e => new { e.Email, e.Phone });
+
+    builder.HasMany(e => e.Roles)
+      .WithMany(e => e.Users)
+      .UsingEntity<UserRole>(
+      l => l.HasOne(d => d.Role)
+        .WithMany(d => d.UserRoles)
+        .HasForeignKey(d => d.RoleId),
+      r => r.HasOne(d => d.User)
+        .WithMany(d => d.UserRoles)
+        .HasForeignKey(d => d.UserId),
+      t =>
+      {
+        t.ToTable("UserRoles");
+        t.HasKey(d => new { d.UserId, d.RoleId });
+      });
   }
 }

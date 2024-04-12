@@ -1,6 +1,7 @@
 ﻿using Redis.OM.Contracts;
 using Redis.OM.Searching;
 using User.API.Infrastructure.Caching.Models;
+using User.API.Infrastructure.Entities;
 
 namespace User.API.Infrastructure.Caching;
 

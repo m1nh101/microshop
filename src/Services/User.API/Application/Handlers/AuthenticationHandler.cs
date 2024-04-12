@@ -19,6 +19,7 @@ public class AuthenticationHandler : IRequestHandler<AuthenticateCommand>
 {
   private readonly UserDbContext _context;
   private readonly UserTokenCachingService _cache;
+  private readonly UserCredentialCachingService _credentialCachingService;
   private readonly IPasswordGenerator _passwordGenerator;
   private readonly IAccessTokenGenerator _accessTokenGenerator;
   private readonly IRefreshTokenGenerator _refreshTokenGenerator;
@@ -28,13 +29,15 @@ public class AuthenticationHandler : IRequestHandler<AuthenticateCommand>
     UserTokenCachingService cache,
     IPasswordGenerator passwordGenerator,
     IAccessTokenGenerator accessTokenGenerator,
-    IRefreshTokenGenerator refreshTokenGenerator)
+    IRefreshTokenGenerator refreshTokenGenerator,
+    UserCredentialCachingService credentialCachingService)
   {
     _context = context;
     _cache = cache;
     _passwordGenerator = passwordGenerator;
     _accessTokenGenerator = accessTokenGenerator;
     _refreshTokenGenerator = refreshTokenGenerator;
+    _credentialCachingService = credentialCachingService;
   }
 
   public async Task<Result> Handle(AuthenticateCommand request)
@@ -46,22 +49,12 @@ public class AuthenticationHandler : IRequestHandler<AuthenticateCommand>
     if (user == null)
       return Result.Failed(new Error("User.NotFound", "username/email is not exist in system"));
 
-
     var password = _passwordGenerator.Generate(request.Password);
     if (password != user.Password)
       return Result.Failed(new Error("User.WrongPassword", "password is incorrect!"));
 
-    // get role of user;
-    // maybe violet S in SOLID;
-    var userRoles = user.Roles.Select(e => e.RoleId);
-    var roles = await _context.Roles
-      .AsNoTracking()
-      .Where(e => userRoles.Any(d => d == e.Id))
-      .Select(e => e.Name)
-      .ToListAsync();
-
     // generate access token
-    var accessToken = _accessTokenGenerator.Generate(user, roles);
+    var accessToken = _accessTokenGenerator.Generate(user, user.Roles.Select(d => d.Name));
     var refreshToken = _refreshTokenGenerator.Generate();
     var userToken = new UserToken()
     {
@@ -72,8 +65,6 @@ public class AuthenticationHandler : IRequestHandler<AuthenticateCommand>
 
     // store access token to cache system
     await _cache.AddUserToken(userToken);
-
-    // write http-cookie to response
 
     return Result.Ok<AuthenticateResponse>(new(user.Id, accessToken, userToken.RefreshToken));
   }
