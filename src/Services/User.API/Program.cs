@@ -8,6 +8,7 @@ using User.API;
 using User.API.Application.Contracts;
 using User.API.Application.Helpers;
 using User.API.Backgrounds;
+using User.API.Infrastructure;
 using User.API.Infrastructure.Caching;
 using User.API.Infrastructure.Database;
 
@@ -47,8 +48,11 @@ builder.Services.AddSingleton<IAccessTokenGenerator, TokenGenerator>();
 builder.Services.AddSingleton<IRefreshTokenGenerator, TokenGenerator>();
 builder.Services.AddSingleton<IPasswordGenerator, PasswordGenerator>();
 
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+
 builder.Services.AddSingleton<DatabaseMigrator>();
 builder.Services.AddSingleton<UserTokenCachingService>();
+builder.Services.AddSingleton<UserCredentialCachingService>();
 
 builder.Services.AddHostedService<DatabaseMigrateService>();
 builder.Services.AddHostedService<RedisIndexService>();

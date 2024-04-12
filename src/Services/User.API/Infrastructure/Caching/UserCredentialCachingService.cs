@@ -18,9 +18,9 @@ public sealed class UserCredentialCachingService
     await _credentials.InsertAsync(credential);
   }
 
-  public async Task<Entities.User?> GetUserCredential(string username, string password)
+  public async Task<Entities.User?> GetUserCredential(string username)
   {
-    var cacheCredential = await _credentials.FirstOrDefaultAsync(e => (e.Username == username || e.Email ==  username) && e.Password == password);
+    var cacheCredential = await _credentials.FirstOrDefaultAsync(e => e.Username == username || e.Email ==  username);
     if (cacheCredential is null)
       return null;
 
@@ -29,7 +29,7 @@ public sealed class UserCredentialCachingService
       name: string.Empty,
       email: username,
       phone: string.Empty,
-      password: password);
+      password: cacheCredential.Password);
     
     foreach(var role in cacheCredential.Roles)
       user.AddToRole(role);
