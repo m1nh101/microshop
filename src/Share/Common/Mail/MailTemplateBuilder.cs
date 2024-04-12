@@ -6,9 +6,9 @@ namespace Common.Mail;
 public abstract class MailTemplateBuilder
 {
   private readonly SendMailPostRequestBody _payload;
-  protected readonly List<Recipient> _receivers;
-  protected string _subject = "";
-  protected string _content = "";
+  private readonly List<Recipient> _receivers;
+  private string _subject = "";
+  protected string Content = "";
 
   public MailTemplateBuilder()
   {
@@ -43,7 +43,7 @@ public abstract class MailTemplateBuilder
     {
       Body = new ItemBody
       {
-        Content = _content,
+        Content = Content,
         ContentType = BodyType.Html
       },
       ToRecipients = _receivers,

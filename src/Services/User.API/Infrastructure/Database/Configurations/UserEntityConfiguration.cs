@@ -1,12 +1,12 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using User.API.Infrastructure.Entities;
+using User.API.Domain.Entities;
 
 namespace User.API.Infrastructure.Database.Configurations;
 
-public sealed class UserEntityConfiguration : IEntityTypeConfiguration<Entities.User>
+public sealed class UserEntityConfiguration : IEntityTypeConfiguration<Domain.Entities.User>
 {
-  public void Configure(EntityTypeBuilder<Entities.User> builder)
+  public void Configure(EntityTypeBuilder<Domain.Entities.User> builder)
   {
     builder.ToTable("Users");
 
@@ -31,6 +31,8 @@ public sealed class UserEntityConfiguration : IEntityTypeConfiguration<Entities.
       .HasMaxLength(512)
       .HasColumnType("varchar(512)")
       .IsRequired(true);
+
+    builder.Ignore(e => e.Events);
 
     builder.HasIndex(e => new { e.Email, e.Phone });
 

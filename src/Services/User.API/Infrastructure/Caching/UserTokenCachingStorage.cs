@@ -1,15 +1,14 @@
 ﻿using Redis.OM.Contracts;
 using Redis.OM.Searching;
-using User.API.Infrastructure.Caching.Models;
-using User.API.Infrastructure.Entities;
+using User.API.Application.CachingModels;
 
 namespace User.API.Infrastructure.Caching;
 
-public sealed class UserTokenCachingService
+public sealed class UserTokenCachingStorage
 {
   private readonly IRedisCollection<UserToken> _tokens;
 
-  public UserTokenCachingService(IRedisConnectionProvider provider)
+  public UserTokenCachingStorage(IRedisConnectionProvider provider)
   {
     _tokens = provider.RedisCollection<UserToken>();
   }

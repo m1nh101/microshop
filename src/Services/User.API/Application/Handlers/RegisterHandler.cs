@@ -1,5 +1,6 @@
 ﻿using API.Contract.Users.Requests;
 using Common;
+using Common.Auth;
 using Common.Mediator;
 using Microsoft.EntityFrameworkCore;
 using User.API.Application.Contracts;
@@ -44,7 +45,7 @@ public class RegisterHandler : IRequestHandler<RegisterRequest>
     if (errors.Count != 0)
       return Result.Failed(errors);
 
-    var user = new Infrastructure.Entities.User(
+    var user = new Domain.Entities.User(
       username: request.Username,
       name: request.Name,
       email: request.Email,
@@ -52,7 +53,7 @@ public class RegisterHandler : IRequestHandler<RegisterRequest>
       password: _passwordGenerator.Generate(request.Password));
 
     var role = await _context.Roles.AsNoTracking()
-      .FirstOrDefaultAsync(e => e.Name.Equals("user"))
+      .FirstOrDefaultAsync(e => e.Name.Equals(PolicyName.User))
       ?? throw new NullReferenceException();
 
     user.AddToRole(role.Id);

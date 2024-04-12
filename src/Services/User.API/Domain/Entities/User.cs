@@ -1,6 +1,9 @@
-﻿namespace User.API.Infrastructure.Entities;
+﻿using Common.EventBus;
+using User.API.Domain.Events;
 
-public class User
+namespace User.API.Domain.Entities;
+
+public class User : DomainEvent
 {
   private User() { }
 
@@ -17,6 +20,7 @@ public class User
     Phone = phone;
     Password = password;
     Id = Guid.NewGuid().ToString();
+    CreateAt = DateTime.Now;
   }
 
   public string Id { get; private set; } = string.Empty;
@@ -25,9 +29,17 @@ public class User
   public string Email { get; private set; } = string.Empty;
   public string Phone { get; private set; } = string.Empty;
   public string Password { get; private set; } = string.Empty;
+  public bool IsConfirm { get; private set; } = false;
+  public DateTime CreateAt { get; private set; }
 
   public virtual ICollection<UserRole> UserRoles { get; private set; } = [];
   public virtual ICollection<Role> Roles { get; private set; } = [];
 
   public void AddToRole(string roleId) => UserRoles.Add(new UserRole(roleId));
+
+  public void Confirm()
+  {
+    IsConfirm = true;
+    AddEvent(new UserConfirmedEvent(Id));
+  }
 }

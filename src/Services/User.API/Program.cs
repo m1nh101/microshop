@@ -1,5 +1,6 @@
 using Common.Auth;
 using Common.EventBus;
+using Common.Mail;
 using Common.Mediator;
 using Microsoft.EntityFrameworkCore;
 using Redis.OM;
@@ -8,9 +9,9 @@ using User.API;
 using User.API.Application.Contracts;
 using User.API.Application.Helpers;
 using User.API.Backgrounds;
-using User.API.Infrastructure;
 using User.API.Infrastructure.Caching;
 using User.API.Infrastructure.Database;
+using User.API.Infrastructure.Database.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -51,14 +52,17 @@ builder.Services.AddSingleton<IPasswordGenerator, PasswordGenerator>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 
 builder.Services.AddSingleton<DatabaseMigrator>();
-builder.Services.AddSingleton<UserTokenCachingService>();
-builder.Services.AddSingleton<UserCredentialCachingService>();
+builder.Services.AddSingleton<UserTokenCachingStorage>();
+builder.Services.AddSingleton<UserCredentialCachingStorage>();
+builder.Services.AddSingleton<IUserConfirmationStorage, UserConfirmationStorage>();
 
 builder.Services.AddHostedService<DatabaseMigrateService>();
 builder.Services.AddHostedService<RedisIndexService>();
 
 builder.Services.AddJwt(builder.Configuration);
 builder.Services.AddMediator(typeof(Program).Assembly);
+builder.Services.AddEventBus(typeof(Program).Assembly, builder.Configuration);
+builder.Services.AddAzureMail(builder.Configuration);
 
 var app = builder.Build();
 

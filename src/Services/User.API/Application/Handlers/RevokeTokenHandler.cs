@@ -9,11 +9,11 @@ public record RevokeTokenCommand;
 
 public class RevokeTokenHandler : IRequestHandler<RevokeTokenCommand>
 {
-  private readonly UserTokenCachingService _cache;
+  private readonly UserTokenCachingStorage _cache;
   private readonly IUserSessionContext _session;
 
   public RevokeTokenHandler(
-    UserTokenCachingService cache,
+    UserTokenCachingStorage cache,
     IUserSessionContext session)
   {
     _cache = cache;

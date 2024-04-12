@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using User.API.Infrastructure.Entities;
+using User.API.Domain.Entities;
 
 namespace User.API.Infrastructure.Database.Configurations;
 

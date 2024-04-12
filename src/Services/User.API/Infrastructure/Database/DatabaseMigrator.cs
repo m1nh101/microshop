@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using User.API.Application.Contracts;
-using User.API.Infrastructure.Entities;
+using User.API.Domain.Entities;
 
 namespace User.API.Infrastructure.Database;
 
@@ -45,7 +45,7 @@ public sealed class DatabaseMigrator
 
     await context.Roles.AddRangeAsync(roles);
 
-    var admin = new Entities.User(
+    var admin = new Domain.Entities.User(
       username: "admin",
       name: "admin",
       email: "admin@gmail.com",

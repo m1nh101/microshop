@@ -11,4 +11,5 @@ internal static class Errors
   public static readonly Error WrongPassword = new("User.Password", "Password is incorrect");
   public static readonly Error RefreshTokenIsNotValid = new("User.Token", "Refresh token is invalid");
   public static readonly Error InvalidUsernameEmail = new("User.Credential", "Username/email is invalid");
+  public static readonly Error InvalidConfirmationCode = new("User.Confirmation", "Invalid confirmation code");
 }

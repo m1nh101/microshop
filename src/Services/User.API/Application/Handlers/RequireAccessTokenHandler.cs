@@ -15,12 +15,12 @@ public record RequireAccessTokenCommand(
 
 public class RequireAccessTokenHandler : IRequestHandler<RequireAccessTokenCommand>
 {
-  private readonly UserTokenCachingService _cache;
+  private readonly UserTokenCachingStorage _cache;
   private readonly UserDbContext _context;
   private readonly IAccessTokenGenerator _accessTokenGenerator;
 
   public RequireAccessTokenHandler(
-    UserTokenCachingService cache,
+    UserTokenCachingStorage cache,
     UserDbContext context,
     IAccessTokenGenerator accessTokenGenerator)
   {
@@ -37,14 +37,10 @@ public class RequireAccessTokenHandler : IRequestHandler<RequireAccessTokenComma
       return Result.Failed(Errors.RefreshTokenIsNotValid);
 
     var user = await _context.Users
+      .AsNoTracking()
       .Include(e => e.Roles)
       .FirstOrDefaultAsync(e => e.Id == token.UserId);
-    var userRoles = user!.Roles.Select(e => e.RoleId);
-    var roles = await _context.Roles
-      .AsNoTracking()
-      .Where(e => userRoles.Any(d => d == e.Id))
-      .Select(e => e.Name)
-      .ToListAsync();
+    var roles = user!.Roles.Select(e => e.Name);
 
     var accessToken = _accessTokenGenerator.Generate(user, roles);
 

@@ -2,5 +2,5 @@
 
 public interface IUserRepository
 {
-  Task<Infrastructure.Entities.User?> GetUser(string username);
+  Task<Domain.Entities.User?> GetUser(string username);
 }

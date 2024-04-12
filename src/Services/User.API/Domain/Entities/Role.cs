@@ -1,4 +1,4 @@
-﻿namespace User.API.Infrastructure.Entities;
+﻿namespace User.API.Domain.Entities;
 
 public class Role
 {

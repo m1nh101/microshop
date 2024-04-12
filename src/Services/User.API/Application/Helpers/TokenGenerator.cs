@@ -18,7 +18,7 @@ public sealed class TokenGenerator : IRefreshTokenGenerator, IAccessTokenGenerat
     _tokenOption = option.Value;
   }
 
-  string IAccessTokenGenerator.Generate(Infrastructure.Entities.User user, IEnumerable<string> roles)
+  string IAccessTokenGenerator.Generate(Domain.Entities.User user, IEnumerable<string> roles)
   {
     var tokenHandler = new JwtSecurityTokenHandler();
     var key = Encoding.UTF8.GetBytes(_tokenOption.SecretKey);

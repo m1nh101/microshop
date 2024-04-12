@@ -9,7 +9,8 @@ public static class EventBusConfiguration
 {
   public static IServiceCollection AddEventBus(this IServiceCollection services, Assembly assembly, IConfiguration configuration)
   {
-    RegisterEventHandler(services, assembly);
+    RegisterIntegratedEventHandler(services, assembly);
+    RegisterDomainEventHandler(services, assembly);
 
     services.AddSingleton(sp =>
     {
@@ -26,11 +27,12 @@ public static class EventBusConfiguration
 
     services.AddHostedService<RabbitMQEventBus>();
     services.AddSingleton<IEventBus, RabbitMQEventBus>();
+    services.AddSingleton<IDomainEventBus, DomainEventBus>();
 
     return services;
   }
 
-  private static void RegisterEventHandler(IServiceCollection services, Assembly assembly)
+  private static void RegisterIntegratedEventHandler(IServiceCollection services, Assembly assembly)
   {
     var root = typeof(IEventHandler<>);
     var implements = assembly.GetTypes()
@@ -47,6 +49,22 @@ public static class EventBusConfiguration
         serviceType: typeof(IEventHandler),
         serviceKey: eventType,
         implementationType: implement);
+    }
+  }
+
+  private static void RegisterDomainEventHandler(IServiceCollection services, Assembly assembly)
+  {
+    var root = typeof(IDomainEventHandler<>);
+    var implements = assembly.GetTypes()
+      .Where(e => e.GetInterfaces().Any(d => d.IsGenericType && d.GetGenericTypeDefinition() == root));
+
+    foreach (var implement in implements)
+    {
+      // get generic parameter
+      var extractInterfaceType = implement.GetInterfaces()
+        .FirstOrDefault(e => e.GetGenericTypeDefinition() == root)!;
+
+      services.AddScoped(extractInterfaceType, implement);
     }
   }
 }

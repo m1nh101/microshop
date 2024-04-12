@@ -2,5 +2,5 @@
 
 public interface IAccessTokenGenerator
 {
-  string Generate(Infrastructure.Entities.User user, IEnumerable<string> roles);
+  string Generate(Domain.Entities.User user, IEnumerable<string> roles);
 }

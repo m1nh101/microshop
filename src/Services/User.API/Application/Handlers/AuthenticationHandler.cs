@@ -2,9 +2,9 @@
 using API.Contract.Users.Responses;
 using Common;
 using Common.Mediator;
+using User.API.Application.CachingModels;
 using User.API.Application.Contracts;
 using User.API.Infrastructure.Caching;
-using User.API.Infrastructure.Caching.Models;
 
 namespace User.API.Application.Handlers;
 
@@ -16,14 +16,14 @@ public record AuthenticateCommand(
 public class AuthenticationHandler : IRequestHandler<AuthenticateCommand>
 {
   private readonly IUserRepository _userRepository;
-  private readonly UserTokenCachingService _cache;
+  private readonly UserTokenCachingStorage _cache;
   private readonly IPasswordGenerator _passwordGenerator;
   private readonly IAccessTokenGenerator _accessTokenGenerator;
   private readonly IRefreshTokenGenerator _refreshTokenGenerator;
 
   public AuthenticationHandler(
     IUserRepository userRepository,
-    UserTokenCachingService cache,
+    UserTokenCachingStorage cache,
     IPasswordGenerator passwordGenerator,
     IAccessTokenGenerator accessTokenGenerator,
     IRefreshTokenGenerator refreshTokenGenerator)

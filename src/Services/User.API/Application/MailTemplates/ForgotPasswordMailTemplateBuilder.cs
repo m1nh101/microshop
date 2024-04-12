@@ -8,7 +8,7 @@ public class ForgotPasswordMailTemplateBuilder : MailTemplateBuilder
   {
     var resetPasswordCode = context["code"];
 
-    _content = $"""
+    Content = $"""
       <div>
         <a href="" style="display:block; padding: 10px; border-radius: 8px; background-color: red; text-decoration: none; color: white; font-size: 16; font-weight: 600; font-family: san-serif; ">Nhấn vào đây để lấy lại mật khẩu</a>
 

@@ -1,6 +1,6 @@
 ﻿using Redis.OM.Modeling;
 
-namespace User.API.Infrastructure.Caching.Models;
+namespace User.API.Application.CachingModels;
 
 [Document(Prefixes = ["Credential"], StorageType = StorageType.Hash)]
 public sealed class UserCredential

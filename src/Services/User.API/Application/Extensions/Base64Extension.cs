@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 using System.Text;
-using User.API.Infrastructure.Caching.Models;
+using User.API.Application.CachingModels;
 
 namespace User.API.Application.Extensions;
 
