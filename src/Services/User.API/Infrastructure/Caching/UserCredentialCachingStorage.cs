@@ -1,10 +1,11 @@
 ﻿using Redis.OM.Contracts;
 using Redis.OM.Searching;
 using User.API.Application.CachingModels;
+using User.API.Application.Contracts;
 
 namespace User.API.Infrastructure.Caching;
 
-public sealed class UserCredentialCachingStorage
+public sealed class UserCredentialCachingStorage : IUserCredentialStorage
 {
   private readonly IRedisCollection<UserCredential> _credentials;
 
@@ -13,10 +14,7 @@ public sealed class UserCredentialCachingStorage
     _credentials = provider.RedisCollection<UserCredential>();
   }
 
-  public async Task CachingNewCredential(UserCredential credential)
-  {
-    await _credentials.InsertAsync(credential);
-  }
+  public Task Add(UserCredential credential) => _credentials.InsertAsync(credential);
 
   public async Task<Domain.Entities.User?> GetUserCredential(string username)
   {

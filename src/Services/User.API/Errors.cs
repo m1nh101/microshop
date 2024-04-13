@@ -12,4 +12,5 @@ internal static class Errors
   public static readonly Error RefreshTokenIsNotValid = new("User.Token", "Refresh token is invalid");
   public static readonly Error InvalidUsernameEmail = new("User.Credential", "Username/email is invalid");
   public static readonly Error InvalidConfirmationCode = new("User.Confirmation", "Invalid confirmation code");
+  public static readonly Error TemporyLock = new("User.Credential", "User credential has been locked in 1 hour");
 }

@@ -1,26 +1,25 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using User.API.Application.CachingModels;
 using User.API.Application.Contracts;
-using User.API.Infrastructure.Caching;
 
 namespace User.API.Infrastructure.Database.Repositories;
 
 public class UserRepository : IUserRepository
 {
-  private readonly UserCredentialCachingStorage _userCredentialCachingService;
+  private readonly IUserCredentialStorage _credentialStorage;
   private readonly UserDbContext _context;
 
   public UserRepository(
-    UserCredentialCachingStorage userCredentialCachingService,
+    IUserCredentialStorage credentialStorage,
     UserDbContext context)
   {
-    _userCredentialCachingService = userCredentialCachingService;
+    _credentialStorage = credentialStorage;
     _context = context;
   }
 
   public async Task<Domain.Entities.User?> GetUser(string username)
   {
-    var cachedUser = await _userCredentialCachingService.GetUserCredential(username);
+    var cachedUser = await _credentialStorage.GetUserCredential(username);
 
     if (cachedUser == null)
     {
@@ -31,7 +30,7 @@ public class UserRepository : IUserRepository
       if (user is null)
         return null;
 
-      await _userCredentialCachingService.CachingNewCredential(new UserCredential
+      await _credentialStorage.Add(new UserCredential
       {
         Email = user.Email,
         Password = user.Password,

@@ -2,6 +2,7 @@
 
 namespace User.API.Application.CachingModels;
 
+[Document(Prefixes = ["Confirmation"], StorageType = StorageType.Hash)]
 public class UserConfirmation
 {
   [RedisIdField]

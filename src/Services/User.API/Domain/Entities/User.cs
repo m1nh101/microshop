@@ -1,9 +1,10 @@
 ﻿using Common.EventBus;
+using User.API.Application.Contracts;
 using User.API.Domain.Events;
 
 namespace User.API.Domain.Entities;
 
-public class User : DomainEvent
+public class User : DomainEvent, IRemoveable
 {
   private User() { }
 
@@ -31,9 +32,11 @@ public class User : DomainEvent
   public string Password { get; private set; } = string.Empty;
   public bool IsConfirm { get; private set; } = false;
   public DateTime CreateAt { get; private set; }
+  public bool IsDeleted { get; private set; }
 
   public virtual ICollection<UserRole> UserRoles { get; private set; } = [];
   public virtual ICollection<Role> Roles { get; private set; } = [];
+
 
   public void AddToRole(string roleId) => UserRoles.Add(new UserRole(roleId));
 
@@ -41,5 +44,11 @@ public class User : DomainEvent
   {
     IsConfirm = true;
     AddEvent(new UserConfirmedEvent(Id));
+  }
+
+  public void Remove()
+  {
+    IsDeleted = true;
+    AddEvent(new UserRemovedEvent(this));
   }
 }

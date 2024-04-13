@@ -1,5 +1,7 @@
 ﻿using Common.EventBus;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Graph.Models;
+using User.API.Application.Contracts;
 using User.API.Domain.Entities;
 
 namespace User.API.Infrastructure.Database;
@@ -23,15 +25,21 @@ public class UserDbContext : DbContext
 
   public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
   {
-    foreach(var entity in ChangeTracker.Entries<DomainEvent>())
+    foreach(var entry in ChangeTracker.Entries<DomainEvent>())
     {
-      var events = entity.Entity.Events;
+      var events = entry.Entity.Events;
 
       foreach(var @event in events)
       {
         await _eventBus.Publish(@event);
-        entity.Entity.RemoveEvent();
+        entry.Entity.RemoveEvent();
       }
+    }
+
+    foreach(var entry in ChangeTracker.Entries<IRemoveable>())
+    {
+      if (entry.State == EntityState.Deleted)
+        entry.Entity.Remove();
     }
 
     return await base.SaveChangesAsync(cancellationToken);

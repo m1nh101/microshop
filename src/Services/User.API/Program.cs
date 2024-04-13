@@ -52,12 +52,13 @@ builder.Services.AddSingleton<IPasswordGenerator, PasswordGenerator>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 
 builder.Services.AddSingleton<DatabaseMigrator>();
-builder.Services.AddSingleton<UserTokenCachingStorage>();
-builder.Services.AddSingleton<UserCredentialCachingStorage>();
+builder.Services.AddSingleton<IUserTokenStorage, UserTokenCachingStorage>();
+builder.Services.AddSingleton<IUserCredentialStorage, UserCredentialCachingStorage>();
 builder.Services.AddSingleton<IUserConfirmationStorage, UserConfirmationStorage>();
 
 builder.Services.AddHostedService<DatabaseMigrateService>();
 builder.Services.AddHostedService<RedisIndexService>();
+builder.Services.AddHostedService<RemoveInactiveUserBackgroundService>();
 
 builder.Services.AddJwt(builder.Configuration);
 builder.Services.AddMediator(typeof(Program).Assembly);

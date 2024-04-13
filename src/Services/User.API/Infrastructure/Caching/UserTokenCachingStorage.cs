@@ -1,10 +1,11 @@
 ﻿using Redis.OM.Contracts;
 using Redis.OM.Searching;
 using User.API.Application.CachingModels;
+using User.API.Application.Contracts;
 
 namespace User.API.Infrastructure.Caching;
 
-public sealed class UserTokenCachingStorage
+public sealed class UserTokenCachingStorage : IUserTokenStorage
 {
   private readonly IRedisCollection<UserToken> _tokens;
 
@@ -13,13 +14,14 @@ public sealed class UserTokenCachingStorage
     _tokens = provider.RedisCollection<UserToken>();
   }
 
-  public async Task AddUserToken(UserToken token) => await _tokens.InsertAsync(token, TimeSpan.FromDays(7));
+  public Task Add(UserToken token) => _tokens.InsertAsync(token, TimeSpan.FromDays(7));
+
   public async Task<UserToken?> GetTokenByRefreshToken(string refreshToken, string userAgent)
   {
     return await _tokens.FirstOrDefaultAsync(e => e.RefreshToken == refreshToken && e.UserAgent == userAgent);
   }
 
-  public async Task RevokeRefreshToken(string userId)
+  public async Task Remove(string userId)
   {
     var token = await _tokens.FirstOrDefaultAsync(e => e.UserId == userId);
     if (token is null) return;

@@ -1,7 +1,7 @@
 ﻿using Common;
 using Common.Auth;
 using Common.Mediator;
-using User.API.Infrastructure.Caching;
+using User.API.Application.Contracts;
 
 namespace User.API.Application.Handlers;
 
@@ -9,20 +9,20 @@ public record RevokeTokenCommand;
 
 public class RevokeTokenHandler : IRequestHandler<RevokeTokenCommand>
 {
-  private readonly UserTokenCachingStorage _cache;
+  private readonly IUserTokenStorage _tokenStorage;
   private readonly IUserSessionContext _session;
 
   public RevokeTokenHandler(
-    UserTokenCachingStorage cache,
+    IUserTokenStorage tokenStorage,
     IUserSessionContext session)
   {
-    _cache = cache;
+    _tokenStorage = tokenStorage;
     _session = session;
   }
 
   public async Task<Result> Handle(RevokeTokenCommand request)
   {
-    await _cache.RevokeRefreshToken(_session.UserId);
+    await _tokenStorage.Remove(_session.UserId);
 
     return Result.Ok();
   }
