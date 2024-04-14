@@ -2,6 +2,7 @@
   Routes:
     UserService:
       ClusterId: UserService
+      RateLimiterPolicy: "API_RATE_LIMITER"
       Match:
         Path: "/user-api/{**catch-all}"
       Transforms:
@@ -9,6 +10,7 @@
         - PathPrefix: /api
     ProductService:
       ClusterId: ProductService
+      RateLimiterPolicy: "API_RATE_LIMITER"
       Match:
         Path: "/product-api/{**catch-all}"
       Transforms:
@@ -16,6 +18,7 @@
         - PathPrefix: /api
     BasketService:
       ClusterId: BasketService
+      RateLimiterPolicy: "API_RATE_LIMITER"
       Match:
         Path: "/basket-api/{**catch-all}"
       Transforms:
@@ -23,6 +26,7 @@
         - PathPrefix: /api
     OrderService:
       ClusterId: OrderService
+      RateLimiterPolicy: "API_RATE_LIMITER"
       Match:
         Path: "/order-api/{**catch-all}"
       Transforms:
