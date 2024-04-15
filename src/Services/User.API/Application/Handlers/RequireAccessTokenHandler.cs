@@ -4,7 +4,6 @@ using Common;
 using Common.Mediator;
 using Microsoft.EntityFrameworkCore;
 using User.API.Application.Contracts;
-using User.API.Infrastructure.Caching;
 using User.API.Infrastructure.Database;
 
 namespace User.API.Application.Handlers;
@@ -15,12 +14,12 @@ public record RequireAccessTokenCommand(
 
 public class RequireAccessTokenHandler : IRequestHandler<RequireAccessTokenCommand>
 {
-  private readonly UserTokenCachingStorage _cache;
+  private readonly IUserTokenStorage _cache;
   private readonly UserDbContext _context;
   private readonly IAccessTokenGenerator _accessTokenGenerator;
 
   public RequireAccessTokenHandler(
-    UserTokenCachingStorage cache,
+    IUserTokenStorage cache,
     UserDbContext context,
     IAccessTokenGenerator accessTokenGenerator)
   {

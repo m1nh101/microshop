@@ -6,4 +6,5 @@ public interface IUserTokenStorage
 {
   Task Add(UserToken token);
   Task Remove(string userId);
+  Task<UserToken?> GetTokenByRefreshToken(string refreshToken, string userAgent);
 }

@@ -1,6 +1,5 @@
 using Client.Admin;
 using Client.Admin.Components;
-using Client.Admin.Services;
 using Common.Auth;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -13,21 +12,11 @@ builder.Services.AddJwt(builder.Configuration);
 
 builder.Services.AddHttpContextAccessor();
 
-builder.Services.AddHttpClient<UserService>(client =>
+builder.Services.AddHttpClient<RequestBuilder>(client =>
 {
   var host = builder.Configuration["SERVER"] ?? "apigateway";
 
-  client.BaseAddress = new Uri($"https://{host}:443");
-}).ConfigurePrimaryHttpMessageHandler(_ => new HttpClientHandler
-{
-  ServerCertificateCustomValidationCallback = (sender, cert, chain, sslPolicyErrors) => { return true; }
-}); ;
-
-builder.Services.AddHttpClient<ProductService>(client =>
-{
-  var host = builder.Configuration["SERVER"] ?? "apigateway";
-
-  client.BaseAddress = new Uri($"https://{host}:443");
+  client.BaseAddress = new Uri($"https://{host}:7168");
 }).ConfigurePrimaryHttpMessageHandler(_ => new HttpClientHandler
 {
   ServerCertificateCustomValidationCallback = (sender, cert, chain, sslPolicyErrors) => { return true; }

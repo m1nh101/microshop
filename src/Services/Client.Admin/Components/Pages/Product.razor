@@ -3,7 +3,6 @@
 @using API.Contract.Products.Requests
 @using API.Contract.Products.Responses
 @using BlazorBootstrap
-@using Client.Admin.Services
 @using System.ComponentModel.DataAnnotations
 
 @rendermode InteractiveServer
@@ -145,7 +144,7 @@
   private TokenProvider Token { get; set; } = new();
 
   [Inject]
-  private ProductService Service { get; set; } = default!;
+  private RequestBuilder RequestBuilder { get; set; } = default!;
 
   [Inject]
   private PersistentComponentState PersistentComponentState { get; set; } = default!;
@@ -192,10 +191,14 @@
 
   private async Task Filter()
   {
-    var request = ToRequest(Request);
-    var response = await Service.GetProducts(request);
+    var payload = ToRequest(Request);
+    var response = await RequestBuilder
+      .WithEndpoint(Endpoints.Product.ProductPagination)
+      .WithPayload(payload)
+      .WithHttpMethod(Admin.HttpMethod.GET)
+      .Send<IEnumerable<ProductPaginationResponse>>();
 
-    Products = response.As<IEnumerable<ProductPaginationResponse>>();
+    Products = response.Data!;
   }
 
   private async Task OpenCreateForm()
@@ -220,7 +223,12 @@
       Payload.Description
     );
 
-    var result = await Service.CreateProduct(request, Token.AccessToken);
+    var result = await RequestBuilder
+      .WithHttpMethod(Admin.HttpMethod.POST)
+      .WithPayload(request)
+      .WithEndpoint(Endpoints.Product.CreateNew)
+      .WithAuthorization(Token.AccessToken)
+      .Send<ProductDetailResponse>();
     if(result.IsSuccess)
     {
       await modal.HideAsync();
@@ -233,10 +241,13 @@
     IsCreateNew = false;
     SelectedProduct = id;
 
-    var response = await Service.GetProduct(id);
+    var response = await RequestBuilder
+      .WithEndpoint($"{Endpoints.Product.ProductDetail}/{id}")
+      .WithHttpMethod(Admin.HttpMethod.GET)
+      .Send<ProductDetailResponse>();
     if (response.IsSuccess)
     {
-      var data = response.As<ProductDetailResponse>();
+      var data = response.Data;
       Payload = new InputRequest
         {
           Name = data.Name,
@@ -268,7 +279,12 @@
       Payload.Description
     );
 
-    var result = await Service.EditProduct(request, Token.AccessToken);
+    var result = await RequestBuilder
+      .WithHttpMethod(Admin.HttpMethod.PATCH)
+      .WithEndpoint(Endpoints.Product.Edit)
+      .WithAuthorization(Token.AccessToken)
+      .WithPayload(request)
+      .Send<ProductDetailResponse>();
     if (result.IsSuccess)
     {
       await modal.HideAsync();
@@ -306,8 +322,11 @@
       Token = token ?? new();
     }
 
-    var options = await Service.GetListOption();
-    var data = options.As<FilterOptionResponse>();
+    var options = await RequestBuilder
+      .WithEndpoint(Endpoints.Product.GetOption)
+      .WithHttpMethod(Admin.HttpMethod.GET)
+      .Send<FilterOptionResponse>();
+    var data = options.Data;
     BrandOptions = data.BrandOptions;
     TypeOptions = data.TypeOptions;
     await Filter();

@@ -1,6 +1,5 @@
 ﻿using Common.EventBus;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Graph.Models;
 using User.API.Application.Contracts;
 using User.API.Domain.Entities;
 

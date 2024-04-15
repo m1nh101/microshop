@@ -1,12 +1,13 @@
 ﻿@page "/login"
+
+@using Microsoft.AspNetCore.Antiforgery
 @using API.Contract.Users.Requests
 @using API.Contract.Users.Responses
-@using Client.Admin.Services
-@using Microsoft.AspNetCore.Antiforgery
+
 @attribute [RequireAntiforgeryToken(required: false)]
 
 @inject NavigationManager Navigator;
-@inject UserService Service;
+@inject RequestBuilder RequestBuilder;
 
 <h3>Login</h3>
 <div>
@@ -43,13 +44,16 @@
 
   public async Task OnSubmitHandler()
   {
-    var request = Input.ToRequest();
-    var response = await Service.Authenticate(request);
+    var payload = Input.ToRequest();
+    var response = await RequestBuilder
+      .WithEndpoint(Endpoints.User.Authentication)
+      .WithPayload(payload)
+      .WithHttpMethod(Admin.HttpMethod.POST)
+      .Send<AuthenticateResponse>();
 
     if(response.IsSuccess)
     {
-      var result = response.As<AuthenticateResponse>();
-      var accessToken = result.AccessToken;
+      var accessToken = response.Data!.AccessToken;
 
       HttpContext.Response.Cookies.Append("access_token", accessToken, new CookieOptions
       {

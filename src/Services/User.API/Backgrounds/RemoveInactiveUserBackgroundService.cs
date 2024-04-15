@@ -6,11 +6,11 @@ namespace User.API.Backgrounds;
 
 public class RemoveInactiveUserBackgroundService : BackgroundService
 {
-  private readonly UserDbContext _context;
+  private readonly IServiceProvider _provider;
 
-  public RemoveInactiveUserBackgroundService(UserDbContext context)
+  public RemoveInactiveUserBackgroundService(IServiceProvider provider)
   {
-    _context = context;
+    _provider = provider;
   }
 
   protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -24,15 +24,18 @@ public class RemoveInactiveUserBackgroundService : BackgroundService
 
   async Task RunCronJob(CancellationToken stoppingToken)
   {
-    var inactiveUsers = await _context.Users
+    var scope = _provider.CreateScope();
+    var context = scope.ServiceProvider.GetRequiredService<UserDbContext>();
+
+    var inactiveUsers = await context.Users
       .Where(e => !e.IsConfirm)
       .ToListAsync(stoppingToken);
     foreach (var user in inactiveUsers)
     {
       if (DateTime.Now.Subtract(user.CreateAt).Days > 7)
-        _context.Remove(user);
+        context.Remove(user);
     }
 
-    await _context.SaveChangesAsync(stoppingToken);
+    await context.SaveChangesAsync(stoppingToken);
   }
 }
