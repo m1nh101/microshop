@@ -1,9 +1,14 @@
-﻿@page "/products"
+﻿@page "/admin/products"
 
 @using API.Contract.Products.Requests
 @using API.Contract.Products.Responses
 @using BlazorBootstrap
 @using System.ComponentModel.DataAnnotations
+@using HTTPMethod = WebUI.HttpMethod
+@using WebUI.Components.Layout
+@using Microsoft.AspNetCore.Authorization
+
+@attribute [Authorize(Roles = "admin")]
 
 @rendermode InteractiveServer
 
@@ -195,7 +200,7 @@
     var response = await RequestBuilder
       .WithEndpoint(Endpoints.Product.ProductPagination)
       .WithPayload(payload)
-      .WithHttpMethod(Admin.HttpMethod.GET)
+      .WithHttpMethod(HTTPMethod.GET)
       .Send<IEnumerable<ProductPaginationResponse>>();
 
     Products = response.Data!;
@@ -224,7 +229,7 @@
     );
 
     var result = await RequestBuilder
-      .WithHttpMethod(Admin.HttpMethod.POST)
+      .WithHttpMethod(HTTPMethod.POST)
       .WithPayload(request)
       .WithEndpoint(Endpoints.Product.CreateNew)
       .WithAuthorization(Token.AccessToken)
@@ -243,7 +248,7 @@
 
     var response = await RequestBuilder
       .WithEndpoint($"{Endpoints.Product.ProductDetail}/{id}")
-      .WithHttpMethod(Admin.HttpMethod.GET)
+      .WithHttpMethod(HTTPMethod.GET)
       .Send<ProductDetailResponse>();
     if (response.IsSuccess)
     {
@@ -280,7 +285,7 @@
     );
 
     var result = await RequestBuilder
-      .WithHttpMethod(Admin.HttpMethod.PATCH)
+      .WithHttpMethod(HTTPMethod.PATCH)
       .WithEndpoint(Endpoints.Product.Edit)
       .WithAuthorization(Token.AccessToken)
       .WithPayload(request)
@@ -324,7 +329,7 @@
 
     var options = await RequestBuilder
       .WithEndpoint(Endpoints.Product.GetOption)
-      .WithHttpMethod(Admin.HttpMethod.GET)
+      .WithHttpMethod(HTTPMethod.GET)
       .Send<FilterOptionResponse>();
     var data = options.Data;
     BrandOptions = data.BrandOptions;

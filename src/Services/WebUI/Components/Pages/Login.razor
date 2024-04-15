@@ -1,8 +1,12 @@
 ﻿@page "/login"
 
+@layout UserLayout
+
 @using Microsoft.AspNetCore.Antiforgery
 @using API.Contract.Users.Requests
 @using API.Contract.Users.Responses
+@using HTTPMethod = WebUI.HttpMethod
+@using WebUI.Components.Layout
 
 @attribute [RequireAntiforgeryToken(required: false)]
 
@@ -48,7 +52,7 @@
     var response = await RequestBuilder
       .WithEndpoint(Endpoints.User.Authentication)
       .WithPayload(payload)
-      .WithHttpMethod(Admin.HttpMethod.POST)
+      .WithHttpMethod(HTTPMethod.POST)
       .Send<AuthenticateResponse>();
 
     if(response.IsSuccess)
@@ -61,8 +65,8 @@
           SameSite = SameSiteMode.None,
           Secure = true
       });
-
-      Navigator.NavigateTo("/");
+      
+      Navigator.NavigateTo("/admin");
       return;
     }
 

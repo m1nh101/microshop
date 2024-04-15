@@ -1,0 +1,100 @@
+﻿@page "/"
+
+@using API.Contract.Baskets.Requests
+@using API.Contract.Products.Requests
+@using API.Contract.Products.Responses
+@using BlazorBootstrap
+@using HTTPMethod = WebUI.HttpMethod
+
+<div class="row gy-3">
+  @foreach(var product in Products)
+  {
+    <div class="col-md-3 col-sm-12">
+      <BlazorBootstrap.Card Style="width: 100%">
+        @* <img class="rounded-top" src="@product.PictureUri" alt="placeholder" /> *@
+        <BlazorBootstrap.CardBody>
+          <BlazorBootstrap.CardTitle Class="text-center">@product.Name</BlazorBootstrap.CardTitle>
+          <BlazorBootstrap.CardSubTitle Class="text-center text-danger">@product.Price</BlazorBootstrap.CardSubTitle>
+          <BlazorBootstrap.Button Style="margin: 0 auto;" Color="BlazorBootstrap.ButtonColor.Primary" @onclick="() => AddToCart(product.Id)">Thêm vào giỏ hàng</BlazorBootstrap.Button>
+        </BlazorBootstrap.CardBody>
+      </BlazorBootstrap.Card>
+    </div>
+  }
+</div>
+
+<Toasts class="p-3" Messages="Messages" Placement="ToastsPlacement.TopRight" AutoHide=true Delay="3000" />
+
+
+@code {
+  private FilterRequest Request { get; set; } = new();
+  private IEnumerable<ProductPaginationResponse> Products = new List<ProductPaginationResponse>();
+  private List<ToastMessage> Messages { get; set; } = new();
+
+  private class FilterRequest
+  {
+    public string Name { get; set; } = string.Empty;
+    public string TypeId { get; set; } = string.Empty;
+    public string BrandId { get; set; } = string.Empty;
+    public int PageIndex { get; set; } = 0;
+  }
+
+  [Inject]
+  private RequestBuilder RequestBuilder { get; set; } = default!;
+
+  [Inject]
+  private PersistentComponentState PersistentComponentState { get; set; } = default!;
+
+  [Inject]
+  private NavigationManager Navigator { get; set; } = default!;
+
+  private TokenProvider Token = default!;
+
+  private async Task Filter()
+  {
+    var payload = new FilterRequest();
+    var response = await RequestBuilder
+      .WithEndpoint(Endpoints.Product.ProductPagination)
+      .WithParams(payload)
+      .WithHttpMethod(HTTPMethod.GET)
+      .Send<IEnumerable<ProductPaginationResponse>>();
+
+    Products = response.Data!;
+  }
+
+  private async Task AddToCart(string id)
+  {
+    if(Token.IsAuthenticated)
+    {
+      var isSuccess = await RequestBuilder.WithEndpoint(Endpoints.Basket.AddOrUpdate)
+        .WithAuthorization(Token.AccessToken)
+        .WithPayload(new AddOrUpdateBasketItemRequest(id, 1))
+        .Send();
+
+      if (isSuccess)
+        Messages.Add(new ToastMessage
+        {
+          Type = ToastType.Success,
+          Message = "Thêm vào giỏ hàng thành công"
+        });
+      else
+        Messages.Add(new()
+        {
+          Type = ToastType.Danger,
+          Message = "Có lỗi xảy ra"
+        });
+
+      return;
+    }
+
+    Navigator.NavigateTo("/login");
+  }
+
+  protected override async Task OnInitializedAsync()
+  {
+    if (PersistentComponentState.TryTakeFromJson<TokenProvider>("token", out TokenProvider? token))
+    {
+      Token = token ?? new();
+    }
+    await Filter();
+  }
+}

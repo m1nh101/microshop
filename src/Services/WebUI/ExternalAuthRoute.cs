@@ -1,4 +1,4 @@
-﻿namespace Client.Admin;
+﻿namespace WebUI;
 
 public static class ExternalAuthRoute
 {

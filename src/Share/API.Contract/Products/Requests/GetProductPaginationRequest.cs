@@ -6,6 +6,4 @@ public sealed record GetProductPaginationRequest
   public string? Name { get; init; } = string.Empty;
   public string[]? Brands { get; init; } = null;
   public string? TypeId { get; init; } = null;
-
-
 }

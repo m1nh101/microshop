@@ -4,7 +4,7 @@ using Newtonsoft.Json.Linq;
 using System.Text;
 using System.Web;
 
-namespace Client.Admin;
+namespace WebUI;
 
 public enum HttpMethod
 {
@@ -22,7 +22,7 @@ public interface IRequestBuilder
 
 public interface INoResponseBuilder
 {
-  Task Send();
+  Task<bool> Send();
 }
 
 
@@ -103,7 +103,7 @@ public class RequestBuilder : INoResponseBuilder, IRequestBuilder
     return this;
   }
 
-  public async Task Send()
+  public async Task<bool> Send()
   {
     var jsonPayload = new StringContent(
       content: JsonConvert.SerializeObject(_payload),
@@ -113,7 +113,7 @@ public class RequestBuilder : INoResponseBuilder, IRequestBuilder
     if (!string.IsNullOrEmpty(_token))
       _client.DefaultRequestHeaders.Add("Authorization", _token);
 
-    _ =_method switch
+    var httpResponse =_method switch
     {
       HttpMethod.POST => await _client.PostAsync(_endpoint, jsonPayload),
       HttpMethod.DELETE => await _client.DeleteAsync(_endpoint),
@@ -121,6 +121,8 @@ public class RequestBuilder : INoResponseBuilder, IRequestBuilder
       HttpMethod.PUT => await _client.PutAsync(_endpoint, jsonPayload),
       _ => throw new NotImplementedException()
     };
+
+    return httpResponse.IsSuccessStatusCode;
   }
 
   public async Task<(bool IsSuccess, T Data, IEnumerable<Error>? Errors)> Send<T>()

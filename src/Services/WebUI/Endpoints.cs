@@ -1,4 +1,4 @@
-﻿namespace Client.Admin;
+﻿namespace WebUI;
 
 public static class Endpoints
 {
@@ -17,5 +17,12 @@ public static class Endpoints
     public const string CreateNew = "/product-api/products";
     public const string Edit = "/product-api/products";
     public const string Delete = "/product-api/products";
+  }
+
+  public struct Basket
+  {
+    public const string GetUser = "/basket-api/baskets";
+    public const string AddOrUpdate = "/basket-api/baskets";
+    public const string Remove = "/basket-api/baskets/items";
   }
 }

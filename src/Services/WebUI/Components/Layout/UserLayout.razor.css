@@ -1,0 +1,9 @@
+﻿.layout_user_nav {
+  position: sticky;
+  top: 0;
+  z-index: 999;
+}
+
+.nav_bg_color {
+  background-color: #45B3FD;
+}

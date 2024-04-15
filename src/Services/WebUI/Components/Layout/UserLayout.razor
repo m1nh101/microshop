@@ -1,0 +1,51 @@
+﻿@inherits LayoutComponentBase
+
+<div class="page">
+  <main>
+    <div class="row p-3 nav_bg_color layout_user_nav">
+      <div id="search-bar" class="col-md-6 offset-md-2">
+        <input class="form-control w-100 ps-2" placeholder="Tên sản phẩm"/>
+      </div>
+      <div class="col-md-2 offset-md-1 d-flex align-items-center justify-content-around">
+        <a href="/login" class="btn btn-light">Đăng nhập</a>
+        <a href="/register" class="btn btn-light">Đăng ký</a>
+        <Microsoft.AspNetCore.Components.Authorization.AuthorizeView>
+          <form method="post" action="/logout">
+            <input type="submit" value="Đăng xuất" class="btn btn-danger" />
+          </form>
+        </Microsoft.AspNetCore.Components.Authorization.AuthorizeView>
+      </div>
+    </div>
+    <article class="content px-4">
+      @Body
+    </article>
+  </main>
+</div>
+
+@code {
+  [CascadingParameter]
+  private HttpContext HttpContext { get; set; } = default!;
+
+  [Inject]
+  private PersistentComponentState PersistentComponentState { get; set; } = default!;
+
+  private TokenProvider Token { get; set; } = new();
+
+  protected override void OnInitialized()
+  {
+    var accessToken = HttpContext.Request.Cookies["access_token"]?.ToString()
+      ?? HttpContext.Request.Headers.Authorization.ToString();
+
+    if (!string.IsNullOrEmpty(accessToken))
+    {
+      Token.AccessToken = accessToken;
+      PersistentComponentState.RegisterOnPersisting(() =>
+      {
+        PersistentComponentState.PersistAsJson("token", Token);
+        return Task.CompletedTask;
+      });
+    }
+
+    base.OnInitialized();
+  }
+}
