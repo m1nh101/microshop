@@ -57,7 +57,7 @@
 
     if(response.IsSuccess)
     {
-      var accessToken = response.Data!.AccessToken;
+      var accessToken = response.Data.AccessToken;
 
       HttpContext.Response.Cookies.Append("access_token", accessToken, new CookieOptions
       {
@@ -65,8 +65,11 @@
           SameSite = SameSiteMode.None,
           Secure = true
       });
-      
-      Navigator.NavigateTo("/admin");
+
+      if (response.Data.IsAdmin)
+        Navigator.NavigateTo("/admin");
+      else
+        Navigator.NavigateTo("/");
       return;
     }
 

@@ -3,4 +3,5 @@
 public record AuthenticateResponse(
   string Id,
   string AccessToken,
-  string RefreshToken);
+  string RefreshToken,
+  bool IsAdmin);

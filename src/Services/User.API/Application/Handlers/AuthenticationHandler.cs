@@ -1,6 +1,7 @@
 ﻿using API.Contract.Users.Requests;
 using API.Contract.Users.Responses;
 using Common;
+using Common.Auth;
 using Common.Mediator;
 using User.API.Application.CachingModels;
 using User.API.Application.Contracts;
@@ -58,6 +59,8 @@ public class AuthenticationHandler : IRequestHandler<AuthenticateCommand>
     // store access token to cache system
     await _tokenStorage.Add(userToken);
 
-    return Result.Ok<AuthenticateResponse>(new(user.Id, accessToken, userToken.RefreshToken));
+    var isAdmin = user.Roles.Any(e => e.Name == PolicyName.Admin);
+
+    return Result.Ok<AuthenticateResponse>(new(user.Id, accessToken, userToken.RefreshToken, isAdmin));
   }
 }
