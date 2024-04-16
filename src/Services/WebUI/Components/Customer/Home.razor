@@ -1,10 +1,13 @@
 ﻿@page "/"
+@page "/home"
 
 @using API.Contract.Baskets.Requests
 @using API.Contract.Products.Requests
 @using API.Contract.Products.Responses
 @using BlazorBootstrap
 @using HTTPMethod = WebUI.HttpMethod
+
+@rendermode InteractiveServer
 
 <div class="row gy-3">
   @foreach(var product in Products)
@@ -15,7 +18,7 @@
         <BlazorBootstrap.CardBody>
           <BlazorBootstrap.CardTitle Class="text-center">@product.Name</BlazorBootstrap.CardTitle>
           <BlazorBootstrap.CardSubTitle Class="text-center text-danger">@product.Price</BlazorBootstrap.CardSubTitle>
-          <BlazorBootstrap.Button Style="margin: 0 auto;" Color="BlazorBootstrap.ButtonColor.Primary" @onclick="() => AddToCart(product.Id)">Thêm vào giỏ hàng</BlazorBootstrap.Button>
+          <BlazorBootstrap.Button Style="margin: 0 auto;" Color="BlazorBootstrap.ButtonColor.Primary" @onclick="@(_ => AddToCart(product.Id))">Thêm vào giỏ hàng</BlazorBootstrap.Button>
         </BlazorBootstrap.CardBody>
       </BlazorBootstrap.Card>
     </div>
@@ -29,6 +32,7 @@
   private FilterRequest Request { get; set; } = new();
   private IEnumerable<ProductPaginationResponse> Products = new List<ProductPaginationResponse>();
   private List<ToastMessage> Messages { get; set; } = new();
+  private TokenProvider Token = default!;
 
   private class FilterRequest
   {
@@ -42,12 +46,10 @@
   private RequestBuilder RequestBuilder { get; set; } = default!;
 
   [Inject]
-  private PersistentComponentState PersistentComponentState { get; set; } = default!;
+  private PersistentComponentState ComponentState { get; set; } = default!;
 
   [Inject]
   private NavigationManager Navigator { get; set; } = default!;
-
-  private TokenProvider Token = default!;
 
   private async Task Filter()
   {
@@ -63,9 +65,11 @@
 
   private async Task AddToCart(string id)
   {
-    if(Token.IsAuthenticated)
+    if(!string.IsNullOrEmpty(Token.AccessToken))
     {
-      var isSuccess = await RequestBuilder.WithEndpoint(Endpoints.Basket.AddOrUpdate)
+      var isSuccess = await RequestBuilder
+        .WithEndpoint(Endpoints.Basket.AddOrUpdate)
+        .WithHttpMethod(HTTPMethod.POST)
         .WithAuthorization(Token.AccessToken)
         .WithPayload(new AddOrUpdateBasketItemRequest(id, 1))
         .Send();
@@ -91,10 +95,22 @@
 
   protected override async Task OnInitializedAsync()
   {
-    if (PersistentComponentState.TryTakeFromJson<TokenProvider>("token", out TokenProvider? token))
+    if (ComponentState.TryTakeFromJson(nameof(TokenProvider), out TokenProvider? token))
+      Token = token!;
+
+    ComponentState.RegisterOnPersisting(() =>
     {
-      Token = token ?? new();
-    }
-    await Filter();
+      if (Products.Any())
+        ComponentState.PersistAsJson(nameof(Products), Products);
+
+      return Task.CompletedTask;
+    });
+
+    ComponentState.TryTakeFromJson(nameof(Products), out IEnumerable<ProductPaginationResponse>? products);
+
+    if (products is not null)
+      Products = products;
+    else
+      await Filter();
   }
 }

@@ -1,0 +1,21 @@
+﻿@page "/campain"
+
+<h3>Campain</h3>
+
+@code {
+  private TokenProvider Token { get; set; } = new();
+
+  [Inject]
+  private RequestBuilder RequestBuilder { get; set; } = default!;
+
+  [Inject]
+  private PersistentComponentState PersistentComponentState { get; set; } = default!;
+
+  protected override void OnInitialized()
+  {
+    if (PersistentComponentState.TryTakeFromJson<TokenProvider>("token", out TokenProvider? token))
+    {
+      Token = token ?? new();
+    }
+  }
+}

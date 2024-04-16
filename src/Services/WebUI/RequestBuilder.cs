@@ -30,7 +30,6 @@ public class RequestBuilder : INoResponseBuilder, IRequestBuilder
 {
   private readonly HttpClient _client;
   private string _endpoint = string.Empty;
-  private bool _noResponse = false;
   private object? _payload;
   private HttpMethod _method;
   private string _token = string.Empty;
@@ -97,12 +96,6 @@ public class RequestBuilder : INoResponseBuilder, IRequestBuilder
     return this;
   }
 
-  public INoResponseBuilder NoResponse()
-  {
-    _noResponse = true;
-    return this;
-  }
-
   public async Task<bool> Send()
   {
     var jsonPayload = new StringContent(
@@ -110,7 +103,7 @@ public class RequestBuilder : INoResponseBuilder, IRequestBuilder
       encoding: Encoding.UTF8,
       mediaType: "application/json");
 
-    if (!string.IsNullOrEmpty(_token))
+    if (!string.IsNullOrEmpty(_token) && string.IsNullOrEmpty(_client.DefaultRequestHeaders.Authorization?.ToString()))
       _client.DefaultRequestHeaders.Add("Authorization", _token);
 
     var httpResponse =_method switch
@@ -133,7 +126,7 @@ public class RequestBuilder : INoResponseBuilder, IRequestBuilder
       encoding: Encoding.UTF8,
       mediaType: "application/json");
 
-    if(!string.IsNullOrEmpty(_token))
+    if (!string.IsNullOrEmpty(_token) && string.IsNullOrEmpty(_client.DefaultRequestHeaders.Authorization?.ToString()))
       _client.DefaultRequestHeaders.Add("Authorization", _token);
 
     var httpResponse = _method switch

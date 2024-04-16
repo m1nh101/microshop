@@ -1,4 +1,4 @@
-﻿using Order.API.Models;
+﻿using API.Contract.Baskets.Models;
 
 namespace Order.API.Applications.Contracts;
 

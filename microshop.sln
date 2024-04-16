@@ -38,7 +38,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Product.Test", "tests\Produ
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "User.Test", "tests\User.Test\User.Test.csproj", "{0C3B2C12-65D3-4189-9CC9-5773102EDB4A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebUI", "src\Services\WebUI\WebUI.csproj", "{4D6BA621-C2CA-454C-AA48-E24CA647B267}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebUI", "src\Services\WebUI\WebUI.csproj", "{4D6BA621-C2CA-454C-AA48-E24CA647B267}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

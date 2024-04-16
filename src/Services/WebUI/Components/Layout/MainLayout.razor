@@ -32,24 +32,23 @@
   private HttpContext HttpContext { get; set; } = default!;
 
   [Inject]
-  private PersistentComponentState PersistentComponentState { get; set; } = default!;
-
-  private TokenProvider Token { get; set; } = new();
+  public PersistentComponentState State { get; set; } = default!;
 
   protected override void OnInitialized()
   {
     var accessToken = HttpContext.Request.Cookies["access_token"]?.ToString()
       ?? HttpContext.Request.Headers.Authorization.ToString();
 
-    if (!string.IsNullOrEmpty(accessToken))
+    State.RegisterOnPersisting(() =>
     {
-      Token.AccessToken = accessToken;
-      PersistentComponentState.RegisterOnPersisting(() =>
-      {
-        PersistentComponentState.PersistAsJson("token", Token);
-        return Task.CompletedTask;
-      });
-    }
+      if (!string.IsNullOrEmpty(accessToken))
+        State.PersistAsJson(nameof(TokenProvider), new TokenProvider
+        {
+          AccessToken = accessToken
+        });
+
+      return Task.CompletedTask;
+    });
 
     base.OnInitialized();
   }

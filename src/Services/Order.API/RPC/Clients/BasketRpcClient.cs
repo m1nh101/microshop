@@ -1,5 +1,5 @@
-﻿using Order.API.Applications.Contracts;
-using Order.API.Models;
+﻿using API.Contract.Baskets.Models;
+using Order.API.Applications.Contracts;
 
 namespace Order.API.RPC.Clients;
 

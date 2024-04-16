@@ -1,5 +1,147 @@
-﻿<h3>Cart</h3>
+﻿@page "/cart"
+
+@using API.Contract.Baskets.Models
+@using API.Contract.Baskets.Requests
+@using API.Contract.Baskets.Responses
+@using BlazorBootstrap
+@using HTTPMethod = WebUI.HttpMethod
+@using Microsoft.AspNetCore.Authorization
+
+@attribute [Authorize]
+
+@rendermode InteractiveServer
+
+<div class="row" style="background-color: rgba(204, 204, 204, 0.8)">
+  <div class="col-md-6 offset-md-2">
+    @foreach(var item in Basket.Items)
+    {
+      <div class="row mb-2 p-3" style="background-color: white">
+        <div class="col-md-2"></div>
+        <div class="col-md-6">
+          <p class="fs-bold mb-2">@item.ProductName</p>
+          <div class="mb-2 d-flex">
+            <BlazorBootstrap.Button Class="m-1" Color="BlazorBootstrap.ButtonColor.Primary" Size="Size.Small" @onclick="@(_=> OnReduceQuantity(item.ProductId))">-</BlazorBootstrap.Button>
+            <input class="form-control form-control-sm" type="number" @bind-value="item.Quantity"/>
+            <BlazorBootstrap.Button Class="m-1" Color="BlazorBootstrap.ButtonColor.Primary" Size="Size.Small" @onclick="@(_ => OnAddQuantity(item.ProductId))">+</BlazorBootstrap.Button>
+          </div>
+          <p class="text-danger">Đơn giá: <span>@item.Price</span></p>
+        </div>
+      </div>
+    }
+  </div>
+  <div class="col-md-3 offset-md-1">
+    <p class="p-2">Tổng cộng: @Basket.Items.Sum(e => e.Quantity * e.Price)</p>
+  </div>
+</div>
+
+<Toasts class="p-3" Messages="Messages" Placement="ToastsPlacement.TopRight" AutoHide=true Delay="3000" />
 
 @code {
+  private CustomerBasket Basket = new CustomerBasket();
+  private List<ToastMessage> Messages { get; set; } = new();
+  private readonly short IncreaseValueChange = 1;
+  private readonly short ReduceValueChange = -1;
 
+  private PersistingComponentStateSubscription _subscription;
+  private TokenProvider Token = default!;
+
+  [Inject]
+  private RequestBuilder RequestBuilder { get; set; } = default!;
+
+  [Inject]
+  private PersistentComponentState ComponentState { get; set; } = default!;
+
+  private async Task OnAddQuantity(string id) => await Update(id, IncreaseValueChange);
+
+  private async Task OnReduceQuantity(string id) => await Update(id, ReduceValueChange);
+
+  private Task OnChangeQuantity(string id)
+  {
+    return Task.CompletedTask;
+  }
+
+  private void UpdateBasket(BasketChangedResponse data)
+  {
+    var item = GetItem(data.ProductId);
+    item.Quantity = data.NewQuantity;
+  }
+
+  private BasketItem GetItem(string id)
+  {
+    return Basket.Items.First(e => e.ProductId == id);
+  }
+
+  private async Task Update(string id, short valueChange)
+  {
+    var item = GetItem(id);
+    var currentQuantity = item.Quantity;
+    var newQuantity = currentQuantity + valueChange;
+
+    var result = await RequestBuilder.WithEndpoint(Endpoints.Basket.AddOrUpdate)
+      .WithAuthorization(Token.AccessToken)
+      .WithPayload(new AddOrUpdateBasketItemRequest(id, newQuantity))
+      .WithHttpMethod(HTTPMethod.POST)
+      .Send<BasketChangedResponse>();
+
+    if (result.IsSuccess)
+    {
+      UpdateBasket(result.Data);
+      Messages.Add(new()
+        {
+          Type = ToastType.Success,
+          Message = "Cập nhật thành công"
+        });
+      return;
+    }
+
+    Messages.Add(new()
+      {
+        Type = ToastType.Danger,
+        Message = "Có lỗi xảy ra"
+      });
+  }
+
+  protected override void OnInitialized()
+  {
+    TokenPersistent();
+  }
+
+  protected override async Task OnInitializedAsync()
+  {
+    await BasketPersistent();
+  }
+
+  async Task BasketPersistent()
+  {
+    ComponentState.RegisterOnPersisting(() =>
+    {
+      if (Basket.Items.Any())
+        ComponentState.PersistAsJson(nameof(Basket), Basket);
+
+      return Task.CompletedTask;
+    });
+
+    ComponentState.TryTakeFromJson(nameof(Basket), out CustomerBasket? basket);
+
+    if (basket is not null)
+      Basket = basket;
+    else
+    {
+      if (Token is not null)
+      {
+        var response = await RequestBuilder.WithEndpoint(Endpoints.Basket.GetUser)
+        .WithAuthorization(Token.AccessToken)
+        .WithHttpMethod(HTTPMethod.GET)
+        .Send<CustomerBasket>();
+
+        Basket = response.Data;
+      }
+    }
+  }
+
+  void TokenPersistent()
+  {
+    if (ComponentState.TryTakeFromJson(nameof(TokenProvider), out TokenProvider? token))
+      Token = token!;
+  }
 }

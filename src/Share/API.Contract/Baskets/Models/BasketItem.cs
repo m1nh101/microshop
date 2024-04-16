@@ -1,4 +1,4 @@
-﻿namespace Order.API.Models;
+﻿namespace API.Contract.Baskets.Models;
 
 public class BasketItem
 {
