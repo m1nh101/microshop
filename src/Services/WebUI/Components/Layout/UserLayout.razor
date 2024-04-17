@@ -7,13 +7,17 @@
         <input class="form-control w-100 ps-2" placeholder="Tên sản phẩm"/>
       </div>
       <div class="col-md-2 offset-md-1 d-flex align-items-center justify-content-around">
-        <a href="/login" class="btn btn-light">Đăng nhập</a>
-        <a href="/register" class="btn btn-light">Đăng ký</a>
-        <NavLink href="/cart" class="btn btn-light">Giỏ hàng</NavLink>
         <Microsoft.AspNetCore.Components.Authorization.AuthorizeView>
-          <form method="post" action="/logout">
-            <input type="submit" value="Đăng xuất" class="btn btn-danger" />
-          </form>
+          <NotAuthorized>
+            <a href="/login" class="btn btn-light">Đăng nhập</a>
+            <a href="/register" class="btn btn-light">Đăng ký</a>
+          </NotAuthorized>
+          <Authorized>
+            <NavLink href="/cart" class="btn btn-light">Giỏ hàng</NavLink>
+            <form method="post" action="/logout">
+              <input type="submit" value="Đăng xuất" class="btn btn-danger" />
+            </form>
+          </Authorized>
         </Microsoft.AspNetCore.Components.Authorization.AuthorizeView>
       </div>
     </div>
