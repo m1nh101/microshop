@@ -20,17 +20,26 @@ public class GetProductDetailHandler : IRequestHandler<GetProductByIdRequest>
   {
     var product = await _context.Products
       .AsNoTracking()
+      .Include(e => e.Brand)
+      .Include(e => e.Categories)
       .Where(e => e.Id == request.Id)
-      .Select(e => new ProductDetailResponse(
-        e.Id,
-        e.Name,
-        e.Price,
-        e.AvailableStock,
-        e.PictureUri,
-        e.BrandId,
-        e.TypeId,
-        e.Description))
-      .FirstOrDefaultAsync();
+      .Include(e => e.Units)
+      .ThenInclude(e => e.Color)
+      .Include(e => e.Units)
+      .ThenInclude(e => e.Size)
+      .Select(e => new ProductDetailResponse
+      {
+        Id = e.Id,
+        Name = e.Name,
+        Price = e.Price,
+        Picture = e.PictureUri,
+        BrandId = e.BrandId,
+        BrandName = e.Brand.Name,
+        Material = e.Material,
+        Description = e.Description,
+        Units = e.Units.Select(d => new UnitDetail(d.Id, d.SizeId, d.Size.Size, d.ColorId, d.Color.Name, d.Price, d.Stock))
+      })
+      .FirstOrDefaultAsync(e => e.Id == request.Id);
 
     if (product is null)
       return Result.Failed(Errors.ProductNotFound);

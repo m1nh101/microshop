@@ -3,9 +3,16 @@
 public record EditProductRequest(
   string Id,
   string Name,
-  int AvailableStock,
   double Price,
   string PictureUri,
   string BrandId,
-  string TypeId,
+  string Collection,
+  string Material,
+  ComplexProperty Categories,
+  EditUnit Unit,
   string Description = "");
+
+public record EditUnit(
+  ProductUnitRequest[] Add,
+  EditUnitRequest[] Edit,
+  string[] Remove);

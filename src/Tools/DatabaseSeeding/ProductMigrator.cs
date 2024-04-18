@@ -1,25 +1,34 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Product.API.Infrastructure.Database;
 using Product.API.Infrastructure.Entities;
 
-namespace Product.API.Infrastructure.Database;
-
-public class DatabaseMigrator
+namespace DatabaseSeeding;
+public class ProductMigrator
 {
-  private readonly IServiceProvider _provider;
+  private readonly ProductDbContext _context;
 
-  public DatabaseMigrator(IServiceProvider provider)
+  public ProductMigrator(ProductDbContext context)
   {
-    _provider = provider;
+    _context = context;
   }
 
-  public async Task Migrate()
+  public async Task Seeding()
   {
-    using var scope = _provider.CreateScope();
-    var context = scope.ServiceProvider.GetRequiredService<ProductDbContext>();
+    if(_context.Products.Any())
+    {
+      await _context.Products.ExecuteDeleteAsync();
+      await _context.Brands.ExecuteDeleteAsync();
+      await _context.Categories.ExecuteDeleteAsync();
+      await _context.Colors.ExecuteDeleteAsync();
+      await _context.Sizes.ExecuteDeleteAsync();
+    }
 
-    var pendingMigrations = await context.Database.GetPendingMigrationsAsync();
-    if (pendingMigrations.Any())
-      await context.Database.MigrateAsync();
+    var brands = SeedingBrand();
+    var sizes = SeedingSize();
+    var colors = SeedingColor();
+    var categories = SeedingCategory();
+
+    await SeedProduct(_context, sizes, colors, categories, brands);
   }
 
   static async Task SeedProduct(ProductDbContext context, ProductSize[] sizes, ProductColor[] colors, Category[] categories, ProductBrand[] brands)
@@ -27,7 +36,7 @@ public class DatabaseMigrator
     var random = new Random();
     var products = new List<ProductItem>();
 
-    for(var i = 0; i < 10000; i++)
+    for (var i = 0; i < 10000; i++)
     {
       var category = categories[random.Next(0, categories.Length)];
       var price = random.Next(1000, 10000) * random.NextDouble();
@@ -37,8 +46,8 @@ public class DatabaseMigrator
         picture: "empty",
         brand: brands[random.Next(brands.Length)],
         material: "Vải").AssignToCategories(category);
-      
-      for(var j = 0; j < 10; j++)
+
+      for (var j = 0; j < 10; j++)
       {
         var additionPrice = random.Next(100, 10000) * random.NextDouble();
         var unit = new ProductUnit(
@@ -79,7 +88,7 @@ public class DatabaseMigrator
     var sizes = new List<ProductSize>();
     string[] sizeText = ["L", "S", "SM", "M", "XL", "XXL"];
 
-    foreach(var size in sizeText)
+    foreach (var size in sizeText)
     {
       sizes.Add(new ProductSize(size, SizeGenre.Kid));
       sizes.Add(new ProductSize(size, SizeGenre.Men));
@@ -94,7 +103,7 @@ public class DatabaseMigrator
     var colors = new HashSet<ProductColor>();
     var random = new Random();
 
-    for(var i = 0; i < 100000; i++)
+    for (var i = 0; i < 100000; i++)
     {
       var hex = string.Format("#{0:X6}", random.Next(0x1000000));
       var color = new ProductColor(hex, hex);

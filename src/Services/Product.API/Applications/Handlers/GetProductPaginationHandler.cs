@@ -20,7 +20,6 @@ public class GetProductPaginationHandler : IRequestHandler<GetProductPaginationR
   public async Task<Result> Handle(GetProductPaginationRequest request)
   {
     var query = _context.Products
-      .Include(e => e.Type)
       .Include(e => e.Brand)
       .AsNoTracking();
     var brands = request.Brands?.Where(e => !string.IsNullOrEmpty(e)).ToList();
@@ -29,8 +28,6 @@ public class GetProductPaginationHandler : IRequestHandler<GetProductPaginationR
       query = query.Where(e => e.Name.StartsWith(request.Name));
     if (brands != null && brands.Count > 0)
       query = query.Where(e => brands.Any(d => d == e.BrandId));
-    if (!string.IsNullOrEmpty(request.TypeId))
-      query = query.Where(e => e.TypeId == request.TypeId);
 
     var products = await query
       .Skip(request.PageIndex * NumberOfItemPerPage)
@@ -40,7 +37,6 @@ public class GetProductPaginationHandler : IRequestHandler<GetProductPaginationR
         e.Name,
         e.Price,
         e.Brand.Name,
-        e.Type.Name,
         e.PictureUri,
         e.Description))
       .ToListAsync();

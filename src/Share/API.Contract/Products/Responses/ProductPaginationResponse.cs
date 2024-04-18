@@ -5,6 +5,5 @@ public record ProductPaginationResponse(
   string Name,
   double Price,
   string BrandName,
-  string TypeName,
   string PictureUri,
   string Desciption);

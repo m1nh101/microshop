@@ -1,6 +1,8 @@
-﻿namespace Product.API.Infrastructure.Entities;
+﻿using Common.Contracts;
 
-public class ProductBrand
+namespace Product.API.Infrastructure.Entities;
+
+public class ProductBrand : IIdentity<string>
 {
   private ProductBrand() { }
 

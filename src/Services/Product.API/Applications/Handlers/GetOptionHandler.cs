@@ -27,15 +27,7 @@ public class GetOptionHandler : IRequestHandler<GetOptionRequest>
         Value = e.Id
       })
       .ToListAsync();
-    var typeOptions = await _context.Types
-      .AsNoTracking()
-      .Select(e => new SelectOption
-      {
-        Label = e.Name,
-        Value = e.Id
-      })
-      .ToListAsync();
-    var data = new FilterOptionResponse(brandOptions, typeOptions);
+    var data = new FilterOptionResponse(brandOptions);
 
     return Result.Ok(data);
   }

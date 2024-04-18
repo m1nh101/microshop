@@ -1,57 +1,38 @@
 ﻿using Common;
+using Common.Contracts;
 
 namespace Product.API.Infrastructure.Entities;
 
-public class ProductItem
+public class ProductItem : IIdentity<string>, ICreateable, IAuditable
 {
   private ProductItem() { }
 
   public ProductItem(
     string name,
-    int availableStock,
     double price,
-    string pictureUri,
-    string brandId,
-    string typeId,
-    string description = "")
-  {
-    Id = Guid.NewGuid().ToString();
-    Name = name;
-    AvailableStock = availableStock;
-    Price = price;
-    PictureUri = pictureUri;
-    BrandId = brandId;
-    TypeId = typeId;
-    Description = description;
-    IsAvailable = true;
-  }
-
-  public ProductItem(
-    string name,
-    int availableStock,
-    double price,
-    string pictureUri,
+    string picture,
     ProductBrand brand,
-    ProductType type,
+    string material,
+    string? collection = null,
     string description = "")
   {
     Id = Guid.NewGuid().ToString();
     Name = name;
-    AvailableStock = availableStock;
     Price = price;
-    PictureUri = pictureUri;
+    PictureUri = picture;
     Brand = brand;
-    Type = type;
+    Material = material;
+    CollectionId = collection;
     Description = description;
     IsAvailable = true;
   }
 
   public string Id { get; private set; } = string.Empty;
   public string Name { get; private set; } = string.Empty;
-  public int AvailableStock { get; private set; }
   public string Description { get; private set; } = string.Empty;
   public double Price { get; private set; }
   public string PictureUri { get; private set; } = string.Empty;
+  public string Material { get; private set; } = string.Empty;
 
   public bool IsAvailable { get; private set; }
 
@@ -60,40 +41,91 @@ public class ProductItem
   public void Update(ProductItem product)
   {
     Name = product.Name;
-    AvailableStock = product.AvailableStock;
     Price = product.Price;
     PictureUri = product.PictureUri;
     BrandId = product.BrandId;
-    TypeId = product.TypeId;
     Description = product.Description;
   }
 
   public string BrandId { get; private set; } = string.Empty;
   public virtual ProductBrand Brand { get; private set; } = null!;
 
-  public string TypeId { get; private set; } = string.Empty;
-  public virtual ProductType Type { get; private set; } = null!;
+  public string? CollectionId { get; private set; }
+  public virtual ProductCollection? Collection { get; private set; }
 
-  public Error AddStock(int quantity)
+  private readonly List<ProductUnit> _units = [];
+  public virtual IReadOnlyCollection<ProductUnit> Units => _units.AsReadOnly();
+
+  private readonly List<Category> _categories = [];
+  public virtual IReadOnlyCollection<Category> Categories => _categories.AsReadOnly();
+  public virtual ICollection<ProductCategory> ProductCategories { get; set; } = null!;
+
+  public DateTime? ModifiedAt { get; set; }
+
+  public string? ModifiedBy { get; set; }
+
+  public DateTime CreatedAt { get; set; }
+
+  public string CreatedBy { get; set; } = string.Empty;
+
+  public ProductItem AssignToCategories(params Category[] categories)
   {
-    if (quantity < 0)
-      return Errors.PositiveStock;
-
-    AvailableStock += quantity;
-
-    return Error.None;
+    _categories.AddRange(categories);
+    return this;
   }
 
-  public Error RemoveStock(int quantity)
+  public ProductItem RemoveAssignedCategories(params string[] categories)
   {
-    if (quantity < 0)
-      return Errors.PositiveStock;
+    foreach(var categoryId in categories)
+    {
+      var existCategory = _categories.First(e => e.Id == categoryId);
+      _categories.Remove(existCategory);
+    }
 
-    if (quantity > AvailableStock)
-      return Errors.MaxAvailableStockAllow;
+    return this;
+  }
 
-    AvailableStock -= quantity;
+  public ProductItem AddUnit(ProductUnit unit)
+  {
+    _units.Add(unit);
+    return this;
+  }
 
-    return Error.None;
+  public ProductItem UpdateUnits(IDictionary<string, (double price, int stock)> units, out ICollection<Error> errors)
+  {
+    errors = new List<Error>();
+
+    foreach(var unit in units)
+    {
+      var unitToUpdate = _units.FirstOrDefault(e => e.Id == unit.Key);
+      if(unitToUpdate is null)
+      {
+        errors.Add(Error.NotFound<ProductUnit>(unit.Key));
+        continue;
+      }
+
+      unitToUpdate.Update(unit.Value.price, unit.Value.stock);
+    }
+
+    return this;
+  }
+
+  public ProductItem RemoveUnit(string[] keys, out ICollection<Error> errors)
+  {
+    errors = new List<Error>();
+
+    foreach(var key in keys)
+    {
+      var unitToRemove = _units.FirstOrDefault(e => e.Id == key);
+      if (unitToRemove is null)
+      {
+        errors.Add(Error.NotFound<ProductUnit>(key));
+        continue;
+      }
+
+      _units.Remove(unitToRemove);
+    }
+
+    return this;
   }
 }

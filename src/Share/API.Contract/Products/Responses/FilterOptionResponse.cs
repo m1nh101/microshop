@@ -3,14 +3,10 @@
 public class FilterOptionResponse
 {
   public FilterOptionResponse(
-    IEnumerable<SelectOption> brandOptions,
-    IEnumerable<SelectOption> typeOptions)
+    IEnumerable<SelectOption> brandOptions)
   {
     BrandOptions = brandOptions;
-    TypeOptions = typeOptions;
   }
-
-  public IEnumerable<SelectOption> TypeOptions { get; }
   public IEnumerable<SelectOption> BrandOptions { get; }
 }
 

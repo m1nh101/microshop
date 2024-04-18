@@ -24,7 +24,7 @@ public sealed class OrderCancelEventHandler : IEventHandler<OrderCanceledEvent>
       var product = await _context.Products.FirstOrDefaultAsync(e => e.Id == item.ProductId)
         ?? throw new NullReferenceException();
 
-      product.AddStock(item.Quantity);
+      //product.AddStock(item.Quantity);
     }
 
     await _context.SaveChangesAsync();

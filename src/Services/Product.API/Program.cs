@@ -35,7 +35,7 @@ builder.Services.AddHostedService<DatabaseHostedService>();
 builder.Services.AddGrpc();
 
 builder.Services.AddMediator(typeof(Program).Assembly);
-builder.Services.AddEventBus(typeof(Program).Assembly, builder.Configuration);
+//builder.Services.AddEventBus(typeof(Program).Assembly, builder.Configuration);
 
 var app = builder.Build();
 
