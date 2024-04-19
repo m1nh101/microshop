@@ -8,7 +8,7 @@ public record EditProductRequest(
   string BrandId,
   string Collection,
   string Material,
-  ComplexProperty Categories,
+  CategoryRequest Categories,
   EditUnit Unit,
   string Description = "");
 

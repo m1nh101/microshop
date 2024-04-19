@@ -2,13 +2,12 @@
 
 public record CreateProductRequest(
   string Name,
-  int AvailableStock,
   double Price,
   string PictureUri,
   string BrandId,
   string Collection,
   string Material,
-  ComplexProperty Categories,
+  CategoryRequest Categories,
   ProductUnitRequest[] Units,
   string Description = "");
 
@@ -23,6 +22,6 @@ public record ProductUnitRequest(
   double Price,
   int Stock);
 
-public record ComplexProperty(
+public record CategoryRequest(
   string[] Add,
   string[] Remove);

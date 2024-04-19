@@ -1,5 +1,5 @@
-﻿using API.Contract.Products.Requests;
-using Common;
+﻿using API.Contract;
+using API.Contract.Products.Requests;
 using Common.Mediator;
 using Microsoft.AspNetCore.Mvc;
 using Product.API.Applications.Handlers;
@@ -37,7 +37,9 @@ public static class Endpoint
   {
     var result = await mediator.Send(request);
 
-    return GenerateHttpResponse(result);
+    return result.IsSuccess
+      ? TypedResults.Created($"/api/products/{result.As<IResourceCreated>().Id}", result.Data)
+      : TypedResults.BadRequest(result.Errors);
   }
 
   private static async Task<IResult> EditProductEndpoint(
@@ -47,7 +49,9 @@ public static class Endpoint
   {
     var result = await mediator.Send(request);
 
-    return GenerateHttpResponse(result);
+    return result.IsSuccess
+      ? TypedResults.Ok(result.Data)
+      : TypedResults.BadRequest(result.Errors);
   }
 
   private static async Task<IResult> RemoveProductEndpoint(
@@ -57,7 +61,9 @@ public static class Endpoint
     var command = new RemoveProductRequest() { Id = id };
     var result = await mediator.Send(command);
 
-    return GenerateHttpResponse(result);
+    return result.IsSuccess
+      ? TypedResults.NoContent()
+      : TypedResults.BadRequest(result.Errors);
   }
 
   private static async Task<IResult> GetOptionEndpoint(
@@ -66,7 +72,7 @@ public static class Endpoint
     var query = new GetOptionRequest();
     var result = await mediator.Send(query);
 
-    return GenerateHttpResponse(result);
+    return TypedResults.Ok(result.Data);
   }
 
   private static async Task<IResult> GetProductDetailEndpoint(
@@ -75,7 +81,10 @@ public static class Endpoint
   {
     var query = new GetProductByIdRequest { Id = id };
     var result = await mediator.Send(query);
-    return GenerateHttpResponse(result);
+
+    return result.IsSuccess
+      ? TypedResults.Ok(result.Data)
+      : TypedResults.NotFound(result.Errors);
   }
 
   private static async Task<IResult> GetProductPaginationEndpoint(
@@ -93,11 +102,9 @@ public static class Endpoint
       TypeId = typeId,
     };
     var result = await mediator.Send(query);
-    return GenerateHttpResponse(result);
-  }
 
-  private static IResult GenerateHttpResponse(Result result)
-  {
-    return result.IsSuccess ? TypedResults.Ok(result.Data) : TypedResults.BadRequest(result.Errors);
+    return result.IsSuccess 
+      ? TypedResults.Ok(result.Data)
+      : TypedResults.BadRequest(result.Errors);
   }
 }

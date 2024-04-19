@@ -1,4 +1,6 @@
-﻿using API.Contract.Products.Requests;
+﻿using API.Contract.Common;
+using API.Contract.Products.Requests;
+using API.Contract.Products.Responses;
 using Common;
 using Common.Mediator;
 using Microsoft.EntityFrameworkCore;
@@ -49,7 +51,7 @@ public class CreateProductHandler : IRequestHandler<CreateProductRequest>
     if (colors is null)
       errors.AddRange(Error.NotFound<ProductColor>(colorPayloads));
 
-    if (errors.Count == 0)
+    if (errors.Count > 0)
       return Result.Failed(errors);
 
     var product = new ProductItem(
@@ -74,10 +76,10 @@ public class CreateProductHandler : IRequestHandler<CreateProductRequest>
     await _context.SaveChangesAsync();
 
     // map entity to response
-    var response = new
+    var response = new ResourceCreateSuccessfulResponse
     {
-      product.Id,
-      product.CreatedAt
+      Id = product.Id,
+      CreatedAt = product.CreatedAt
     };
 
     return Result.Ok(response);

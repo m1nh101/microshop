@@ -1,4 +1,5 @@
 ﻿using API.Contract.Products.Requests;
+using API.Contract.Products.Responses;
 using Common;
 using Common.Mediator;
 using Microsoft.EntityFrameworkCore;
@@ -59,7 +60,7 @@ public class EditProductHandler : IRequestHandler<EditProductRequest>
     if (colors is null)
       errors.AddRange(Error.NotFound<ProductColor>(colorPayloads));
 
-    if (errors.Count == 0)
+    if (errors.Count > 0)
       return Result.Failed(errors);
 
     // update to product
@@ -82,11 +83,11 @@ public class EditProductHandler : IRequestHandler<EditProductRequest>
 
     var errorAfterUpdateSuccess = unitUpdateError.Concat(unitRemoveError).ToList();
 
-    var response = new
+    var response = new ProductUpdatedSuccessfullyResponse
     {
-      product.Id,
-      product.ModifiedAt,
-      UnitAttachFailed = errorAfterUpdateSuccess
+      Id = product.Id,
+      ModifiedAt = product.ModifiedAt!.Value,
+      UnitUpdateErrors = errorAfterUpdateSuccess
     };
 
     return Result.Ok(response);
