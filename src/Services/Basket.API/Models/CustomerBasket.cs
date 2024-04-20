@@ -23,9 +23,9 @@ public class CustomerBasket
       existItem.SetPrice(item.Price);
     }
   }
-  public Error RemoveItem(string productId)
+  public Error RemoveItem(string productId, string unitId)
   {
-    var item = Items.FirstOrDefault(e => e.ProductId == productId);
+    var item = Items.FirstOrDefault(e => e.ProductId == productId && e.UnitId == unitId);
     if (item is null)
       return Errors.ItemNotExist;
 

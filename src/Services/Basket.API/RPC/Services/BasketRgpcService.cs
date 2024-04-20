@@ -12,16 +12,17 @@ public class BasketRgpcService : BasketRgpc.BasketRgpcBase
     _repository = repository;
   }
 
-  public override async Task<BasketReply> GetBasket(GetBasketByUserIdRequest request, ServerCallContext context)
+  public override async Task<BasketMessageReply> GetBasket(BasketByUserIdMessageRequest request, ServerCallContext context)
   {
-    var response = new BasketReply();
+    var response = new BasketMessageReply();
     var basket = await _repository.GetBasket(request.UserId);
 
     if (basket is null)
       return response;
 
-    var items = basket.Items.Select(e => new BasketItemReply
+    var items = basket.Items.Select(e => new BasketItemPartMessage
     {
+      UnitId = e.UnitId,
       PictureUrl = e.PictureUri,
       ProductId = e.ProductId,
       ProductName = e.ProductName,

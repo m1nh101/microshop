@@ -40,7 +40,7 @@ public class CreateOrderHandler : IRequestHandler<CreateOrderRequest>
     if (itemsInBasket == null || !itemsInBasket.Any())
       return Result.Failed(Errors.EmptyBasket);
 
-    var items = itemsInBasket.Select(e => new OrderItem(e.ProductId, e.ProductName, e.PictureUri, e.Price, e.Quantity));
+    var items = itemsInBasket.Select(e => new OrderItem(e.ProductId, e.UnitId, e.ProductName,e.UnitDetail , e.PictureUri, e.Price, e.Quantity));
     var order = new BuyerOrder(_session.UserId, _session.Name, request.ShippingAddress, items);
 
     await _context.Orders.AddAsync(order);

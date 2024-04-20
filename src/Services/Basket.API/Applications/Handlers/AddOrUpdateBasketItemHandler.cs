@@ -2,7 +2,6 @@
 using API.Contract.Baskets.Responses;
 using Basket.API.Models;
 using Basket.API.Repositories;
-using Basket.API.RPC.Clients;
 using Common;
 using Common.Auth;
 using Common.Mediator;
@@ -13,16 +12,16 @@ public sealed class AddOrUpdateBasketItemHandler : IRequestHandler<AddOrUpdateBa
 {
   private readonly IUserSessionContext _session;
   private readonly IBasketRepository _repository;
-  private readonly ProductRpcClient _productClient;
+  private readonly ProductRpc.ProductRpcClient _productGrpcClient;
 
   public AddOrUpdateBasketItemHandler(
     IUserSessionContext session,
     IBasketRepository repository,
-    ProductRpcClient productClient)
+    ProductRpc.ProductRpcClient productGrpcClient)
   {
     _session = session;
     _repository = repository;
-    _productClient = productClient;
+    _productGrpcClient = productGrpcClient;
   }
 
   public async Task<Result> Handle(AddOrUpdateBasketItemRequest request)
@@ -31,23 +30,26 @@ public sealed class AddOrUpdateBasketItemHandler : IRequestHandler<AddOrUpdateBa
         ?? new CustomerBasket() { CustomerId = _session.UserId };
 
     // check product is valid or not
-    var product = await _productClient.GetProduct(request.ProductId);
-    if (product is null)
+    var unitMessageRequest = new ProductUnitMessageRequest { UnitId = request.UnitId, ProductId = request.ProductId };
+    var unit = await _productGrpcClient.GetProductUnitInformationAsync(unitMessageRequest);
+    if (unit is null)
       return Result.Failed(Errors.InvalidProduct);
 
     // check quantity is valid or not
-    if (product.AvailableStock < request.Quantity)
+    if (unit.Stock < request.Quantity)
       return Result.Failed(Errors.InvalidQuantity);
 
     var basketItem = new BasketItem
     {
-      ProductId = product.ProductId,
-      ProductName = product.Name,
-      PictureUri = product.PictureUri,
+      ProductId = unit.ProductId,
+      UnitId = unit.UnitId,
+      ProductName = unit.Name,
+      PictureUri = unit.Picture,
+      UnitDetail = $"Kích cỡ: {unit.Size}, Màu: {unit.Color}",
     };
 
-    Error[] errors = [basketItem.SetQuantity(request.Quantity), basketItem.SetPrice(product.Price)];
-    if (errors.Where(e => !e.Equals(Error.None)).Any())
+    var errors = Error.Verify([basketItem.SetQuantity(request.Quantity), basketItem.SetPrice(unit.Price)]);
+    if (errors is not null)
       return Result.Failed(errors);
 
     basket.AddOrUpdate(basketItem);
@@ -56,7 +58,7 @@ public sealed class AddOrUpdateBasketItemHandler : IRequestHandler<AddOrUpdateBa
 
     var response = new BasketChangedResponse()
     {
-      ProductId = request.ProductId,
+      UnitId = request.UnitId,
       NewTotalItemPrice = basketItem.ToPrice(),
       NewQuantity = request.Quantity,
       NewTotalBasketPrice = basket.TotalPrice

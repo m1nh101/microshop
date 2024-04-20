@@ -1,5 +1,6 @@
 ﻿using Common;
 using Common.Mediator;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Order.API.Applications.Orders.Handlers;
 using Order.API.Applications.Orders.Responses;
@@ -28,7 +29,10 @@ public static class Endpoint
   {
     var result = await mediator.Send(request);
 
-    return GenerateHttpResponse(result);
+    if (result.IsSuccess)
+      return TypedResults.Created($"/api/orders/{result.As<CustomerOrderResponse>().Id}", result.Data);
+
+    return TypedResults.BadRequest(result.Errors);
   }
 
   private static async Task<IResult> CancelOrderEndpoint(
@@ -48,7 +52,9 @@ public static class Endpoint
     var query = new GetOrderRequest();
     var result = await mediator.Send(query);
 
-    return GenerateHttpResponse(result);
+    return result.IsSuccess
+      ? TypedResults.Ok(result.Data)
+      : TypedResults.NotFound();
   }
 
   private static async Task<IResult> GetUserOrderEndpoint(
@@ -57,7 +63,9 @@ public static class Endpoint
     var query = new GetUserOrderRequest();
     var result = await mediator.Send(query);
 
-    return GenerateHttpResponse(result);
+    return result.IsSuccess
+      ? TypedResults.Ok(result.Data)
+      : TypedResults.NotFound();
   }
 
   private static async Task<IResult> GetOrderDetail(
@@ -67,11 +75,8 @@ public static class Endpoint
     var query = new GetOrderDetailRequest(orderId);
     var result = await mediator.Send(query);
 
-    return GenerateHttpResponse(result);
-  }
-
-  private static IResult GenerateHttpResponse(Result result)
-  {
-    return result.IsSuccess ? TypedResults.Ok(result.Data) : TypedResults.BadRequest(result.Errors);
+    return result.IsSuccess
+      ? TypedResults.Ok(result.Data)
+      : TypedResults.NotFound();
   }
 }

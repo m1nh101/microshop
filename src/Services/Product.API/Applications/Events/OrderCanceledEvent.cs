@@ -19,12 +19,28 @@ public sealed class OrderCancelEventHandler : IEventHandler<OrderCanceledEvent>
 
   public async Task Handle(OrderCanceledEvent @event)
   {
-    foreach(var item in @event.Items)
+    var groupUnitByProduct = @event.Items.GroupBy(e => e.ProductId)
+      .Select(e => new
+      {
+        ProductId = e.Key,
+        Units = e.Select(d => new
+        {
+          d.UnitId,
+          d.Quantity,
+        })
+      }).ToList();
+
+    foreach (var item in groupUnitByProduct)
     {
-      var product = await _context.Products.FirstOrDefaultAsync(e => e.Id == item.ProductId)
+      var product = await _context.Products
+        .Include(e => e.Units)
+        .FirstOrDefaultAsync(e => e.Id == item.ProductId)
         ?? throw new NullReferenceException();
 
-      //product.AddStock(item.Quantity);
+      var unitToUpdate = item.Units
+        .ToDictionary(e => e.UnitId, e => e.Quantity);
+
+      product.UpdateUnits(unitToUpdate, true);
     }
 
     await _context.SaveChangesAsync();

@@ -2,4 +2,5 @@
 
 public sealed record AddOrUpdateBasketItemRequest(
   string ProductId,
+  string UnitId,
   int Quantity);

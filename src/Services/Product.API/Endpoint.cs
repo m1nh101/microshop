@@ -1,4 +1,5 @@
 ﻿using API.Contract;
+using API.Contract.Common;
 using API.Contract.Products.Requests;
 using Common.Mediator;
 using Microsoft.AspNetCore.Mvc;
@@ -38,7 +39,7 @@ public static class Endpoint
     var result = await mediator.Send(request);
 
     return result.IsSuccess
-      ? TypedResults.Created($"/api/products/{result.As<IResourceCreated>().Id}", result.Data)
+      ? TypedResults.Created($"/api/products/{result.As<ResourceCreateSuccessfulResponse>().Id}", result.Data)
       : TypedResults.BadRequest(result.Errors);
   }
 

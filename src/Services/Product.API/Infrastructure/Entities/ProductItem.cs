@@ -91,7 +91,7 @@ public class ProductItem : IIdentity<string>, ICreateable, IAuditable
     return this;
   }
 
-  public ProductItem UpdateUnits(IDictionary<string, (double price, int stock)> units, out ICollection<Error> errors)
+  public ProductItem UpdateUnits(IDictionary<string, (double Price, int Stock)> units, out ICollection<Error> errors)
   {
     errors = new List<Error>();
 
@@ -104,10 +104,23 @@ public class ProductItem : IIdentity<string>, ICreateable, IAuditable
         continue;
       }
 
-      unitToUpdate.Update(unit.Value.price, unit.Value.stock);
+      unitToUpdate.Update(unit.Value.Price, unit.Value.Stock);
     }
 
     return this;
+  }
+
+  public void UpdateUnits(IDictionary<string, int> units, bool isRestore)
+  {
+    foreach (var unit in units)
+    {
+      var unitToUpdate = _units.First(e => e.Id == unit.Key);
+
+      if (isRestore)
+        unitToUpdate.AddStock(unit.Value);
+      else
+        unitToUpdate.ReduceStock(unit.Value);
+    }
   }
 
   public ProductItem RemoveUnit(string[] keys, out ICollection<Error> errors)

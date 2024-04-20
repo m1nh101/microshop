@@ -26,13 +26,13 @@ public class RemoveBasketItemHandler : IRequestHandler<RemoveBasketItemRequest>
     if (basket is null)
       return Result.Failed(Errors.BasketNotFound);
 
-    var error = basket.RemoveItem(request.ProductId);
+    var error = basket.RemoveItem(request.ProductId, request.UnitId);
     if (error.Equals(Error.None))
     {
       await _repository.UpdateBasket(basket);
       var data = new BasketChangedResponse
       {
-        ProductId = request.ProductId,
+        UnitId = request.UnitId,
         NewQuantity = 0,
         NewTotalItemPrice = 0,
         NewTotalBasketPrice = basket.TotalPrice

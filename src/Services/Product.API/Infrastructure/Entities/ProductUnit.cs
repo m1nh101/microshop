@@ -39,4 +39,20 @@ public class ProductUnit : IIdentity<string>, ICreateable, IAuditable
     Price = price;
     Stock = stock;
   }
+
+  public void ReduceStock(int quantity)
+  {
+    if (quantity < 0)
+      return;
+
+    Stock -= quantity;
+  }
+
+  public void AddStock(int quantity)
+  {
+    if (quantity < 0)
+      return;
+
+    Stock += quantity;
+  }
 }

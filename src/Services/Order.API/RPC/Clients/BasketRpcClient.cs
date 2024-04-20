@@ -14,15 +14,17 @@ public class BasketRpcClient : IBasketClient
 
   public async Task<IEnumerable<BasketItem>> GetBasket(string userId)
   {
-    var basket = await _client.GetBasketAsync(new GetBasketByUserIdRequest { UserId = userId });
+    var basket = await _client.GetBasketAsync(new BasketByUserIdMessageRequest { UserId = userId });
 
     return basket.Items.Select(e => new BasketItem
     {
+      UnitId = e.UnitId,
       Price = e.Price,
       ProductId = e.ProductId,
       Quantity = e.Quantity,
       ProductName = e.ProductName,
-      PictureUri = e.PictureUrl
+      PictureUri = e.PictureUrl,
+      UnitDetail = e.UnitDetail,
     });
   }
 }

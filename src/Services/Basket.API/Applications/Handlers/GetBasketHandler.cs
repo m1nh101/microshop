@@ -1,5 +1,4 @@
-﻿using Basket.API.Models;
-using Basket.API.Repositories;
+﻿using Basket.API.Repositories;
 using Common;
 using Common.Auth;
 using Common.Mediator;

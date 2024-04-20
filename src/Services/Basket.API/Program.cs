@@ -1,7 +1,6 @@
 using Basket.API;
 using Basket.API.HostedServices;
 using Basket.API.Repositories;
-using Basket.API.RPC.Clients;
 using Basket.API.RPC.Services;
 using Common.Auth;
 using Common.EventBus;
@@ -46,9 +45,7 @@ builder.Services.AddSingleton(sp =>
   };
   var host = builder.Configuration["PRODUCT_RPC_CLIENT"] ?? throw new NullReferenceException();
   var channel = GrpcChannel.ForAddress(host, option); //use env
-  var grpcClient = new ProductRpc.ProductRpcClient(channel);
-
-  return new ProductRpcClient(grpcClient);
+  return new ProductRpc.ProductRpcClient(channel);
 });
 
 builder.Services.AddJwt(builder.Configuration);

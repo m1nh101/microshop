@@ -14,7 +14,7 @@ public static class Endpoint
   {
     builder.MapGet("/api/baskets", GetBasketEndpoint).RequireAuthorization();
     builder.MapPost("/api/baskets", AddOrUpdateBasketItemEndpoint).RequireAuthorization();
-    builder.MapDelete("/api/baskets/items/{id}", RemoveBasketItemEndpoint).RequireAuthorization();
+    builder.MapDelete("/api/baskets/items/{productId}/units/{unitId}", RemoveBasketItemEndpoint).RequireAuthorization();
 
     return builder;
   }
@@ -25,7 +25,9 @@ public static class Endpoint
     var query = new GetBasketRequest();
     var result = await mediator.Send(query);
 
-    return GenerateHttpResponse(result);
+    return result.IsSuccess
+      ? TypedResults.Ok(result.Data)
+      : TypedResults.BadRequest(result.Errors);
   }
 
   private static async Task<IResult> AddOrUpdateBasketItemEndpoint(
@@ -33,21 +35,21 @@ public static class Endpoint
     [FromBody] AddOrUpdateBasketItemRequest request)
   {
     var result = await mediator.Send(request);
-    return GenerateHttpResponse(result);
+
+    return result.IsSuccess
+      ? TypedResults.Created("/api/baskets", result.Data)
+      : TypedResults.BadRequest(result.Errors);
   }
 
   private static async Task<IResult> RemoveBasketItemEndpoint(
     [FromServices] IMediator mediator,
-    [FromRoute] string id)
+    [FromRoute] string productId, string unitId)
   {
-    var command = new RemoveBasketItemRequest(id);
+    var command = new RemoveBasketItemRequest(productId, unitId);
     var result = await mediator.Send(command);
 
-    return GenerateHttpResponse(result);
-  }
-
-  private static IResult GenerateHttpResponse(Result result)
-  {
-    return result.IsSuccess ? TypedResults.Ok(result.Data) : TypedResults.BadRequest(result.Errors);
+    return result.IsSuccess
+      ? TypedResults.NoContent()
+      : TypedResults.BadRequest(result.Errors);
   }
 }
