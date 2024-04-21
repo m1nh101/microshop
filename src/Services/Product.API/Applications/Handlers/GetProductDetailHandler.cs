@@ -4,6 +4,7 @@ using Common;
 using Common.Mediator;
 using Microsoft.EntityFrameworkCore;
 using Product.API.Infrastructure.Database;
+using Product.API.Infrastructure.Entities;
 
 namespace Product.API.Applications.Handlers;
 
@@ -42,7 +43,7 @@ public class GetProductDetailHandler : IRequestHandler<GetProductByIdRequest>
       .FirstOrDefaultAsync(e => e.Id == request.Id);
 
     if (product is null)
-      return Result.Failed(Errors.ProductNotFound);
+      return Result.Failed(Summary.NotFound, Error.NotFound<ProductItem>(request.Id));
 
     return Result.Ok(product);
   }

@@ -1,4 +1,5 @@
-﻿using Basket.API.Repositories;
+﻿using API.Contract.Baskets.Models;
+using Basket.API.Repositories;
 using Common;
 using Common.Auth;
 using Common.Mediator;
@@ -24,7 +25,7 @@ public sealed class GetBasketHandler : IRequestHandler<GetBasketRequest>
   {
     var basket = await _repository.GetBasket(_session.UserId);
     if (basket is null)
-      return Result.Failed(Errors.BasketNotFound);
+      return Result.Failed(Summary.NotFound, Error.NotFound<CustomerBasket>(_session.UserId));
 
     return Result.Ok(basket);
   }

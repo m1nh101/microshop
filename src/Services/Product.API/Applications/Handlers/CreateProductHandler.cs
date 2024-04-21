@@ -52,7 +52,7 @@ public class CreateProductHandler : IRequestHandler<CreateProductRequest>
       errors.AddRange(Error.NotFound<ProductColor>(colorPayloads));
 
     if (errors.Count > 0)
-      return Result.Failed(errors);
+      return Result.ValidateFailed([.. errors]);
 
     var product = new ProductItem(
       name: request.Name,

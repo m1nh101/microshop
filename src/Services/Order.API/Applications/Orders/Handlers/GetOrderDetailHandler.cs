@@ -4,6 +4,7 @@ using Common.Mediator;
 using Microsoft.EntityFrameworkCore;
 using Order.API.Applications.Orders.Responses;
 using Order.API.Infrastructure;
+using Order.API.Infrastructure.Entities;
 
 namespace Order.API.Applications.Orders.Handlers;
 
@@ -27,7 +28,7 @@ public class GetOrderDetailHandler : IRequestHandler<GetOrderDetailRequest>
   {
     var order = await _context.Orders.FirstOrDefaultAsync(e => e.Id == request.OrderId && e.UserId == _session.UserId);
     if (order is null)
-      return Result.Failed(Errors.NotFound);
+      return Result.Failed(Summary.NotFound, Error.NotFound<BuyerOrder>(request.OrderId));
 
     return Result.Ok(new CustomerOrderResponse(
       order.Id,

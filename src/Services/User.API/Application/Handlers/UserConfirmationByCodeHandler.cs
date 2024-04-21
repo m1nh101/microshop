@@ -39,6 +39,6 @@ public class UserConfirmationByCodeHandler : IRequestHandler<UserConfirmationByC
       await _context.SaveChangesAsync();
     }
 
-    return Result.Failed(Errors.InvalidConfirmationCode);
+    return Result.Failed(Summary.InvalidPayload, Errors.InvalidConfirmationCode);
   }
 }

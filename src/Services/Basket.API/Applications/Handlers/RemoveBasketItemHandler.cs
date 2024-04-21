@@ -1,4 +1,5 @@
-﻿using API.Contract.Baskets.Requests;
+﻿using API.Contract.Baskets.Models;
+using API.Contract.Baskets.Requests;
 using API.Contract.Baskets.Responses;
 using Basket.API.Repositories;
 using Common;
@@ -24,7 +25,7 @@ public class RemoveBasketItemHandler : IRequestHandler<RemoveBasketItemRequest>
   {
     var basket = await _repository.GetBasket(_session.UserId);
     if (basket is null)
-      return Result.Failed(Errors.BasketNotFound);
+      return Result.Failed(Summary.NotFound, Error.NotFound<CustomerBasket>(_session.UserId));
 
     var error = basket.RemoveItem(request.ProductId, request.UnitId);
     if (error.Equals(Error.None))
@@ -41,6 +42,6 @@ public class RemoveBasketItemHandler : IRequestHandler<RemoveBasketItemRequest>
       return Result.Ok(data);
     }
 
-    return Result.Failed(error);
+    return Result.Failed(Summary.InternalError, error);
   }
 }

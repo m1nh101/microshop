@@ -26,7 +26,7 @@ public class EditProductHandler : IRequestHandler<EditProductRequest>
       .Include(e => e.Brand)
       .FirstOrDefaultAsync(e => e.Id == request.Id);
     if (product == null)
-      return Result.Failed(Errors.ProductNotFound);
+      return Result.Failed(Summary.NotFound, Error.NotFound<ProductItem>(request.Id));
 
     var errors = new List<Error>();
     var sizePayloads = request.Unit.Add.Select(x => x.SizeId);
@@ -61,7 +61,7 @@ public class EditProductHandler : IRequestHandler<EditProductRequest>
       errors.AddRange(Error.NotFound<ProductColor>(colorPayloads));
 
     if (errors.Count > 0)
-      return Result.Failed(errors);
+      return Result.ValidateFailed([.. errors]);
 
     // update to product
     var unitsToUpdate = request.Unit.Edit.ToDictionary(e => e.Id, e => (e.Price, e.Stock));

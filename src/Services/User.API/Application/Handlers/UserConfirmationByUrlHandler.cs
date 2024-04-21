@@ -26,7 +26,7 @@ public class UserConfirmationByUrlHandler : IRequestHandler<UserConfirmationByUr
   {
     var userId = await _storage.ConfirmUser(request.Token);
     if (string.IsNullOrEmpty(userId))
-      return Result.Failed(Errors.InvalidConfirmationCode);
+      return Result.Failed(Summary.InvalidPayload, Errors.InvalidConfirmationCode);
 
     var user = await _context.Users.FirstOrDefaultAsync(e => e.Id == userId);
 

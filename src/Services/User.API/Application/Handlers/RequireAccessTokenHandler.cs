@@ -33,7 +33,7 @@ public class RequireAccessTokenHandler : IRequestHandler<RequireAccessTokenComma
     // check token validation
     var token = await _cache.GetTokenByRefreshToken(request.RefreshToken, request.UserAgent);
     if (token == null)
-      return Result.Failed(Errors.RefreshTokenIsNotValid);
+      return Result.Failed(Summary.InvalidPayload, Errors.RefreshTokenIsNotValid);
 
     var user = await _context.Users
       .AsNoTracking()

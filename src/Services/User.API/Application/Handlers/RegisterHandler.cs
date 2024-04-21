@@ -43,7 +43,7 @@ public class RegisterHandler : IRequestHandler<RegisterRequest>
       errors.Add(Errors.ConfirmPasswordNotMatch);
 
     if (errors.Count != 0)
-      return Result.Failed(errors);
+      return Result.Failed(Summary.DuplicateValue, [..errors]);
 
     var user = new Domain.Entities.User(
       username: request.Username,

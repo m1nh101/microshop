@@ -59,7 +59,7 @@ public class ResultUnitTest
   [Test]
   public void CastingTypeOnFailureResultTest()
   {
-    var result = Result.Failed(new Error("Test", "Test"));
+    var result = Result.Failed(Summary.NotFound, new Error("Test", "Test"));
     Assert.Multiple(() =>
     {
       Assert.That(result.Data, Is.Null);

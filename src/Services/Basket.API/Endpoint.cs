@@ -1,8 +1,5 @@
 ﻿using API.Contract.Baskets.Requests;
-using API.Contract.Baskets.Responses;
 using Basket.API.Applications.Handlers;
-using Basket.API.Models;
-using Common;
 using Common.Mediator;
 using Microsoft.AspNetCore.Mvc;
 
@@ -27,7 +24,7 @@ public static class Endpoint
 
     return result.IsSuccess
       ? TypedResults.Ok(result.Data)
-      : TypedResults.BadRequest(result.Errors);
+      : TypedResults.BadRequest(result.Error);
   }
 
   private static async Task<IResult> AddOrUpdateBasketItemEndpoint(
@@ -38,7 +35,7 @@ public static class Endpoint
 
     return result.IsSuccess
       ? TypedResults.Created("/api/baskets", result.Data)
-      : TypedResults.BadRequest(result.Errors);
+      : TypedResults.BadRequest(result.Error);
   }
 
   private static async Task<IResult> RemoveBasketItemEndpoint(
@@ -50,6 +47,6 @@ public static class Endpoint
 
     return result.IsSuccess
       ? TypedResults.NoContent()
-      : TypedResults.BadRequest(result.Errors);
+      : TypedResults.BadRequest(result.Error);
   }
 }

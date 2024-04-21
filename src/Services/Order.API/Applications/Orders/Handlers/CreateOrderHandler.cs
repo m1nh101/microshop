@@ -38,7 +38,7 @@ public class CreateOrderHandler : IRequestHandler<CreateOrderRequest>
 
     var itemsInBasket = await _basketClient.GetBasket(_session.UserId);
     if (itemsInBasket == null || !itemsInBasket.Any())
-      return Result.Failed(Errors.EmptyBasket);
+      return Result.Failed(Summary.MissingRequirement, new Error(nameof(_session.UserId), "Cannot create order if user does not have any item in basket"));
 
     var items = itemsInBasket.Select(e => new OrderItem(e.ProductId, e.UnitId, e.ProductName,e.UnitDetail , e.PictureUri, e.Price, e.Quantity));
     var order = new BuyerOrder(_session.UserId, _session.Name, request.ShippingAddress, items);

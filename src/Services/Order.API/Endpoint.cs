@@ -1,6 +1,5 @@
 ﻿using Common;
 using Common.Mediator;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Order.API.Applications.Orders.Handlers;
 using Order.API.Applications.Orders.Responses;
@@ -32,7 +31,7 @@ public static class Endpoint
     if (result.IsSuccess)
       return TypedResults.Created($"/api/orders/{result.As<CustomerOrderResponse>().Id}", result.Data);
 
-    return TypedResults.BadRequest(result.Errors);
+    return TypedResults.BadRequest(result.Error);
   }
 
   private static async Task<IResult> CancelOrderEndpoint(

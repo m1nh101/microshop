@@ -35,10 +35,10 @@ public class CancelOrderHandler : IRequestHandler<CancelOrderRequest>
       .Include(e => e.Items)
       .FirstOrDefaultAsync(e => e.Id == request.OrderId && e.UserId == _session.UserId);
     if (order is null)
-      return Result.Failed(Errors.NotFound);
+      return Result.Failed(Summary.NotFound, Error.NotFound<BuyerOrder>(_session.UserId));
 
     if (DateTime.Now.Subtract(order.CreatedAt).Days > DaysAllowToCancel)
-      return Result.Failed(Errors.TimeToCancelHasExpired);
+      return Result.Failed("Time to cancel order has expired", new Error(nameof(order.CreatedAt), $"Duration allow to cancel order is 1 day, your order has been created since {order.CreatedAt}"));
 
     order.SetStatus(OrderStatus.Canceled);
     await _context.SaveChangesAsync();

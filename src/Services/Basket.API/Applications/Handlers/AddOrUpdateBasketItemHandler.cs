@@ -33,11 +33,11 @@ public sealed class AddOrUpdateBasketItemHandler : IRequestHandler<AddOrUpdateBa
     var unitMessageRequest = new ProductUnitMessageRequest { UnitId = request.UnitId, ProductId = request.ProductId };
     var unit = await _productGrpcClient.GetProductUnitInformationAsync(unitMessageRequest);
     if (unit is null)
-      return Result.Failed(Errors.InvalidProduct);
+      return Result.ValidateFailed(Errors.InvalidProduct);
 
     // check quantity is valid or not
     if (unit.Stock < request.Quantity)
-      return Result.Failed(Errors.InvalidQuantity);
+      return Result.ValidateFailed(Errors.InvalidQuantity);
 
     var basketItem = new BasketItem
     {
@@ -50,7 +50,7 @@ public sealed class AddOrUpdateBasketItemHandler : IRequestHandler<AddOrUpdateBa
 
     var errors = Error.Verify([basketItem.SetQuantity(request.Quantity), basketItem.SetPrice(unit.Price)]);
     if (errors is not null)
-      return Result.Failed(errors);
+      return Result.ValidateFailed([..errors]);
 
     basket.AddOrUpdate(basketItem);
 

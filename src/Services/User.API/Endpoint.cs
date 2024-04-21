@@ -52,7 +52,7 @@ public static class Endpoint
       return TypedResults.Ok(result.Data);
     }
 
-    return TypedResults.BadRequest(result.Errors);
+    return TypedResults.BadRequest(result.Error);
   }
 
   private static async Task<IResult> RegisterEndpoint(
@@ -91,6 +91,6 @@ public static class Endpoint
 
   private static IResult GenerateHttpResponse(Result result)
   {
-    return result.IsSuccess ? TypedResults.Ok(result.Data) : TypedResults.BadRequest(result.Errors);
+    return result.IsSuccess ? TypedResults.Ok(result.Data) : TypedResults.BadRequest(result.Error);
   }
 }

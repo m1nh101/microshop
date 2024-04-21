@@ -40,11 +40,11 @@ public class AuthenticationHandler : IRequestHandler<AuthenticateCommand>
     var user = await _userRepository.GetUser(request.Username);
 
     if (user == null)
-      return Result.Failed(Errors.InvalidUsernameEmail);
+      return Result.Failed(Summary.InvalidPayload, Errors.InvalidUsernameEmail);
 
     var password = _passwordGenerator.Generate(request.Password);
     if (password != user.Password)
-      return Result.Failed(Errors.WrongPassword);
+      return Result.Failed(Summary.InvalidPayload, Errors.WrongPassword);
 
     // generate access token
     var accessToken = _accessTokenGenerator.Generate(user, user.Roles.Select(d => d.Name));

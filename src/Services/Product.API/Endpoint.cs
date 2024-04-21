@@ -1,5 +1,4 @@
-﻿using API.Contract;
-using API.Contract.Common;
+﻿using API.Contract.Common;
 using API.Contract.Products.Requests;
 using Common.Mediator;
 using Microsoft.AspNetCore.Mvc;
@@ -40,7 +39,7 @@ public static class Endpoint
 
     return result.IsSuccess
       ? TypedResults.Created($"/api/products/{result.As<ResourceCreateSuccessfulResponse>().Id}", result.Data)
-      : TypedResults.BadRequest(result.Errors);
+      : TypedResults.BadRequest(result.Error);
   }
 
   private static async Task<IResult> EditProductEndpoint(
@@ -52,7 +51,7 @@ public static class Endpoint
 
     return result.IsSuccess
       ? TypedResults.Ok(result.Data)
-      : TypedResults.BadRequest(result.Errors);
+      : TypedResults.BadRequest(result.Error);
   }
 
   private static async Task<IResult> RemoveProductEndpoint(
@@ -64,7 +63,7 @@ public static class Endpoint
 
     return result.IsSuccess
       ? TypedResults.NoContent()
-      : TypedResults.BadRequest(result.Errors);
+      : TypedResults.BadRequest(result.Error);
   }
 
   private static async Task<IResult> GetOptionEndpoint(
@@ -85,7 +84,7 @@ public static class Endpoint
 
     return result.IsSuccess
       ? TypedResults.Ok(result.Data)
-      : TypedResults.NotFound(result.Errors);
+      : TypedResults.NotFound(result.Error);
   }
 
   private static async Task<IResult> GetProductPaginationEndpoint(
@@ -106,6 +105,6 @@ public static class Endpoint
 
     return result.IsSuccess 
       ? TypedResults.Ok(result.Data)
-      : TypedResults.BadRequest(result.Errors);
+      : TypedResults.BadRequest(result.Error);
   }
 }
